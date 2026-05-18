@@ -86,13 +86,18 @@ enableInlineShortcodes = true
 
   # ---------- 社交图标 ----------
   # 图标名称参考：https://github.com/adityatelange/hugo-PaperMod/wiki/Icons
+
+  [[params.socialIcons]]
+    name = "QQ"
+    url = "https://qm.qq.com/q/Reh5RKNLu8"
+
   [[params.socialIcons]]
     name = "Github"                    # 图标名称
     url = "https://github.com/wanzif"  # 链接地址
 
   [[params.socialIcons]]
     name = "Email"
-    url = "193105425@qq.com"
+    url = "mailto:193105425@qq.com"
 
   [[params.socialIcons]]
     name = "RSS"
