@@ -1,6 +1,8 @@
 ---
-title: "个人介绍"
-date: 2026-05-18
+title: "关于"
+layout: "about"
+url: "/about/"
+summary: "关于我"
 ---
 
 # 欢迎来到我的博客 👋
@@ -18,7 +20,7 @@ date: 2026-05-18
 
 - AI 自动化
 
-## 联系方式
+## 联系方式（请勿催更）
 
 - 💬 QQ：[点击添加](https://qm.qq.com/q/Reh5RKNLu8)
 - 💻 GitHub：[wanzif](https://github.com/wanzif)
@@ -31,7 +33,10 @@ date: 2026-05-18
 [![GitHub](https://strong-1256321004.cos.ap-shanghai.myqcloud.com/img/20260518201640193.svg)](https://github.com/wanzif)
 [![QQ](https://strong-1256321004.cos.ap-shanghai.myqcloud.com/img/20260518201639203.svg)](https://qm.qq.com/q/Reh5RKNLu8)
 
+很有意思的图标，再放一次
 
+[![GitHub](https://img.shields.io/badge/GitHub-wanzif-181717?style=flat-square&logo=github)](https://github.com/wanzif)
+[![QQ](https://img.shields.io/badge/QQ-联系交流-12B6F2?style=flat-square&logo=tencent-qq)](https://qm.qq.com/q/Reh5RKNLu8)
 
 
 
