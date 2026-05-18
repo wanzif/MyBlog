@@ -154,28 +154,71 @@ enableInlineShortcodes = true
 # Markdown 渲染配置
 # ================================================
 [markup]
-  # Goldmark 渲染器配置
-  [markup.goldmark.renderer]
-    # 允许渲染原始 HTML（用于某些特殊标签）
-    unsafe = true
+  # Goldmark 渲染器配置（Hugo 默认的 Markdown 渲染器）
+  [markup.goldmark]
+    # 渲染器配置
+    [markup.goldmark.renderer]
+      # 是否允许不安全的 HTML，true 表示允许
+      # 用于支持在 Markdown 中嵌入 HTML 标签
+      unsafe = true
+    
+    # 扩展配置
+    [markup.goldmark.extensions]
+      # 数学公式扩展配置
+      [markup.goldmark.extensions.passthrough]
+        # 是否启用，true 表示启用
+        enable = true
+        
+        # 数学公式分隔符配置
+        [markup.goldmark.extensions.passthrough.delimiters]
+          # 块级数学公式分隔符
+          block = [
+            ["\\[", "\\]"],  # \[...\] 格式
+            ["$$", "$$"]     # $$...$$ 格式
+          ]
+          
+          # 行内数学公式分隔符
+          inline = [
+            ["\\(", "\\)"]   # \(...\) 格式
+          ]
 
   # 代码高亮配置
   [markup.highlight]
-    # 是否使用 CSS 类名（PaperMod 需要 false）
+    # 是否禁用 CSS 类，false 表示使用 CSS 类
+    # 设置为 false 可以自定义代码高亮样式
     noClasses = false
-    # 代码高亮主题：onedark / monokai / github 等
+    
+    # 代码高亮主题，onedark 是一个流行的深色主题
+    # 其他可选主题：monokai、github、dracula 等
     style = "onedark"
+    
+    # 是否启用代码围栏，true 表示启用
+    codeFences = true
+    
+    # 是否猜测代码语言，true 表示启用
+    guessSyntax = true
+    
+    # 是否显示行号，true 表示显示
+    # lineNos = true
+    
+    # 行号起始数字
+    # lineNoStart = 1
+    
+    # 行号在表格中，true 表示启用
+    # lineNumbersInTable = true
+    
+    # 是否启用锚点行号，true 表示启用
+    # anchorLineNos = true
 
-  # 数学公式配置
-  [markup.goldmark.extensions]
-    [markup.goldmark.extensions.passthrough]
-      enable = true                    # 开启 passthrough 扩展
-      delimiters = [
-        # 块级公式：$$...$$
-        ["$$\n", "\n$$"],
-        # 行内公式：$...$
-        ["$", "$"]
-      ]
+# ------------------------------------------------------------
+# 网站地图配置（可选）
+# ------------------------------------------------------------
+
+# [sitemap]
+#   changefreq = "weekly"      # 更新频率
+#   filename = "sitemap.xml"   # 文件名
+#   priority = 0.5             # 优先级
+
 
 # ================================================
 # RSS 配置
