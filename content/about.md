@@ -1,5 +1,4 @@
 ---
-​---
 # 关于页面 - 个人介绍
 title: "About me"
 layout: "about"
@@ -8,7 +7,6 @@ summary: "关于我"
 description: "About Wanzf"
 ShowBreadCrumbs: true
 ShowReadingTime: false
-​---
 ---
 
 ## 关于我
