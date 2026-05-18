@@ -20,6 +20,19 @@ date: 2026-05-18
 
 ## 联系方式
 
-- GitHub：https://github.com/wanzif
-- 邮箱：193105425@qq.com
-- QQ：https://qm.qq.com/q/Reh5RKNLu8
+- 💬 QQ：[点击添加](https://qm.qq.com/q/Reh5RKNLu8)
+- 💻 GitHub：[wanzif](https://github.com/wanzif)
+- 🌐 博客：[wanzf.com](https://wanzf.com)
+
+---
+
+### 📢 社交账号
+
+[![GitHub](https://strong-1256321004.cos.ap-shanghai.myqcloud.com/img/20260518201640193.svg)](https://github.com/wanzif)
+[![QQ](https://strong-1256321004.cos.ap-shanghai.myqcloud.com/img/20260518201639203.svg)](https://qm.qq.com/q/Reh5RKNLu8)
+
+
+
+
+
+*用 ❤️ 构建，持续更新中...*
