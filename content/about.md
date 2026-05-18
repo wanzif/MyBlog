@@ -1,15 +1,19 @@
 ---
-title: "关于"
+​---
+# 关于页面 - 个人介绍
+title: "About me"
 layout: "about"
 url: "/about/"
 summary: "关于我"
+description: "About Wanzf"
+ShowBreadCrumbs: true
+ShowReadingTime: false
+​---
 ---
 
-# 欢迎来到我的博客 👋
+## 关于我
 
 这是一位终身学习的老师、网络工程师、自媒体创作者，QQ Farm Master...
-
-## 关于我
 
 - 🎓 主授：Linux、Windows、数据库、Docker、Python、Shell、信息安全技术、网络技术、计算机组装与维护...
 - 📝 备考：软考高级网络规划设计师
