@@ -3,3 +3,9 @@ languageCode = "zh-cn"
 title = "Wanzf's Blog"
 theme = ["PaperMod"]
 enableRobotsTXT = true
+
+[params]
+  title = "Wanzf's Blog"
+  description = "生活不易，少爷卖艺"
+  author = "Wanzf"
+
