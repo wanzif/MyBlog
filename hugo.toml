@@ -1,5 +1,5 @@
-baseURL = "https://example.org/"
+baseURL = "https://wanzf.com/"
 languageCode = "zh-cn"
-title = "我的博客"
+title = "Wanzf's Blog"
 theme = ["PaperMod"]
 enableRobotsTXT = true
