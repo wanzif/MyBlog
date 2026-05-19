@@ -6,7 +6,7 @@ url: "/search/"
 summary: "搜索"
 description: "搜索博客文章"
 placeholder: "输入关键词搜索..."
-ShowReadingTime: true
+ShowReadingTime: false
 ShowWordCount: true
 searchHidden: false
 ---
