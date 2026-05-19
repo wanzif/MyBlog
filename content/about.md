@@ -1,11 +1,10 @@
 ---
 # 关于页面 - 个人介绍
-title: "About me"
+title: "About Wanzf"
 layout: "about"
 url: "/about/"
 summary: "关于我"
-description: "About Wanzf"
-ShowBreadCrumbs: true
+ShowBreadCrumbs: false
 ShowReadingTime: false
 ---
 
