@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>校园WiFi优化实战指南 | Wanzf&#39;s Blog</title>
+<meta name="keywords" content="无线优化, 网络">
+<meta name="description" content="校园WiFi优化实战指南
+
+从&quot;全员吐槽&quot;到&quot;流畅上网&quot;——一个真实校园WiFi改造项目的完整记录
+
+
+前言
+写给谁看的？
+本文面向零基础网络管理员，假设你：
+
+听说过WiFi，但不知道信道、频宽是什么
+拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手
+遇到用户抱怨&quot;WiFi卡&quot;，不知道从哪排查
+
+本文不讲什么？
+不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲实战中用得上的东西——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。
+项目概况速览
+
+  
+      
+          项目
+          详情
+      
+  
+  
+      
+          场景
+          6层教学楼，60个教室 &#43; 12个走廊
+      
+      
+          设备
+          锐捷AC WS6108 &#43; 72台RG-AP730-L
+      
+      
+          用户数
+          880&#43; 终端同时连接
+      
+      
+          网络结构
+          管理VLAN 3997，用户VLAN 1101
+      
+      
+          优化前状态
+          连不上、卡顿、2.4G干扰严重
+      
+  
+
+
+第一章：先搞懂这些基本概念
+动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道&quot;血压&quot;、&ldquo;血糖&quot;是什么指标一样。
+1.1 AP和AC是什么？
+AP（Access Point）：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是发射无线信号，让手机/电脑能连上来。通常安装在教室天花板中间位置。
+AC（Wireless Access Controller）：无线控制器，可以理解为AP的&quot;大脑&rdquo;。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。
+1.2 什么是信道？
+你可以把信道理解为WiFi的&quot;车道&quot;。
+我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。2.4G频段的频率范围是2400MHz~2483MHz，把这段频率切成多个&quot;车道&quot;，每个&quot;车道&quot;就是一个信道。
+2.4G频段的关键知识：
+
+信道宽度约20MHz
+相邻信道会重叠干扰（就像相邻车道会蹭到）
+只有1、6、11这三个信道是不重叠的——这是铁律！
+
+2.4G信道分布示意：
+
+信道:  1    2    3    4    5    6    7    8    9   10   11
+      |====|====|====|====|====|====|====|====|====|====|====|
+      |_______________________|
+              信道 1 (中心频率 2412MHz)
+                |_______________________|
+                        信道 6 (中心频率 2437MHz)
+                          |_______________________|
+                                  信道 11 (中心频率 2462MHz)
+
+说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰
+5G频段就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。">
+<meta name="author" content="Wanzf">
+<link rel="canonical" href="http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/">
+<link crossorigin="anonymous" href="http://localhost:1313/assets/css/stylesheet.89ca4972ab5e6aaa05e9a0dae0c4bb64b26585bc79e36f5cf33614eea0283abe.css" integrity="sha256-icpJcqteaqoF6aDa4MS7ZLJlhbx5429c8zYU7qAoOr4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/">
+  <meta property="og:site_name" content="Wanzf&#39;s Blog">
+  <meta property="og:title" content="校园WiFi优化实战指南">
+  <meta property="og:description" content="校园WiFi优化实战指南 从&#34;全员吐槽&#34;到&#34;流畅上网&#34;——一个真实校园WiFi改造项目的完整记录
+前言 写给谁看的？
+本文面向零基础网络管理员，假设你：
+听说过WiFi，但不知道信道、频宽是什么 拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手 遇到用户抱怨&#34;WiFi卡&#34;，不知道从哪排查 本文不讲什么？
+不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲实战中用得上的东西——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。
+项目概况速览
+项目 详情 场景 6层教学楼，60个教室 &#43; 12个走廊 设备 锐捷AC WS6108 &#43; 72台RG-AP730-L 用户数 880&#43; 终端同时连接 网络结构 管理VLAN 3997，用户VLAN 1101 优化前状态 连不上、卡顿、2.4G干扰严重 第一章：先搞懂这些基本概念 动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道&#34;血压&#34;、“血糖&#34;是什么指标一样。
+1.1 AP和AC是什么？ AP（Access Point）：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是发射无线信号，让手机/电脑能连上来。通常安装在教室天花板中间位置。
+AC（Wireless Access Controller）：无线控制器，可以理解为AP的&#34;大脑”。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。
+1.2 什么是信道？ 你可以把信道理解为WiFi的&#34;车道&#34;。
+我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。2.4G频段的频率范围是2400MHz~2483MHz，把这段频率切成多个&#34;车道&#34;，每个&#34;车道&#34;就是一个信道。
+2.4G频段的关键知识：
+信道宽度约20MHz 相邻信道会重叠干扰（就像相邻车道会蹭到） 只有1、6、11这三个信道是不重叠的——这是铁律！ 2.4G信道分布示意： 信道: 1 2 3 4 5 6 7 8 9 10 11 |====|====|====|====|====|====|====|====|====|====|====| |_______________________| 信道 1 (中心频率 2412MHz) |_______________________| 信道 6 (中心频率 2437MHz) |_______________________| 信道 11 (中心频率 2462MHz) 说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰 5G频段就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-19T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-05-19T00:00:00+00:00">
+    <meta property="article:tag" content="无线优化">
+    <meta property="article:tag" content="网络">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="校园WiFi优化实战指南">
+  <meta name="twitter:description" content="校园WiFi优化实战指南 从&#34;全员吐槽&#34;到&#34;流畅上网&#34;——一个真实校园WiFi改造项目的完整记录
+前言 写给谁看的？
+本文面向零基础网络管理员，假设你：
+听说过WiFi，但不知道信道、频宽是什么 拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手 遇到用户抱怨&#34;WiFi卡&#34;，不知道从哪排查 本文不讲什么？
+不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲实战中用得上的东西——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。
+项目概况速览
+项目 详情 场景 6层教学楼，60个教室 &#43; 12个走廊 设备 锐捷AC WS6108 &#43; 72台RG-AP730-L 用户数 880&#43; 终端同时连接 网络结构 管理VLAN 3997，用户VLAN 1101 优化前状态 连不上、卡顿、2.4G干扰严重 第一章：先搞懂这些基本概念 动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道&#34;血压&#34;、“血糖&#34;是什么指标一样。
+1.1 AP和AC是什么？ AP（Access Point）：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是发射无线信号，让手机/电脑能连上来。通常安装在教室天花板中间位置。
+AC（Wireless Access Controller）：无线控制器，可以理解为AP的&#34;大脑”。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。
+1.2 什么是信道？ 你可以把信道理解为WiFi的&#34;车道&#34;。
+我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。2.4G频段的频率范围是2400MHz~2483MHz，把这段频率切成多个&#34;车道&#34;，每个&#34;车道&#34;就是一个信道。
+2.4G频段的关键知识：
+信道宽度约20MHz 相邻信道会重叠干扰（就像相邻车道会蹭到） 只有1、6、11这三个信道是不重叠的——这是铁律！ 2.4G信道分布示意： 信道: 1 2 3 4 5 6 7 8 9 10 11 |====|====|====|====|====|====|====|====|====|====|====| |_______________________| 信道 1 (中心频率 2412MHz) |_______________________| 信道 6 (中心频率 2437MHz) |_______________________| 信道 11 (中心频率 2462MHz) 说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰 5G频段就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "校园WiFi优化实战指南",
+      "item": "http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "校园WiFi优化实战指南",
+  "name": "校园WiFi优化实战指南",
+  "description": "校园WiFi优化实战指南 从\u0026quot;全员吐槽\u0026quot;到\u0026quot;流畅上网\u0026quot;——一个真实校园WiFi改造项目的完整记录\n前言 写给谁看的？\n本文面向零基础网络管理员，假设你：\n听说过WiFi，但不知道信道、频宽是什么 拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手 遇到用户抱怨\u0026quot;WiFi卡\u0026quot;，不知道从哪排查 本文不讲什么？\n不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲实战中用得上的东西——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。\n项目概况速览\n项目 详情 场景 6层教学楼，60个教室 + 12个走廊 设备 锐捷AC WS6108 + 72台RG-AP730-L 用户数 880+ 终端同时连接 网络结构 管理VLAN 3997，用户VLAN 1101 优化前状态 连不上、卡顿、2.4G干扰严重 第一章：先搞懂这些基本概念 动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道\u0026quot;血压\u0026quot;、\u0026ldquo;血糖\u0026quot;是什么指标一样。\n1.1 AP和AC是什么？ AP（Access Point）：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是发射无线信号，让手机/电脑能连上来。通常安装在教室天花板中间位置。\nAC（Wireless Access Controller）：无线控制器，可以理解为AP的\u0026quot;大脑\u0026rdquo;。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。\n1.2 什么是信道？ 你可以把信道理解为WiFi的\u0026quot;车道\u0026quot;。\n我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。2.4G频段的频率范围是2400MHz~2483MHz，把这段频率切成多个\u0026quot;车道\u0026quot;，每个\u0026quot;车道\u0026quot;就是一个信道。\n2.4G频段的关键知识：\n信道宽度约20MHz 相邻信道会重叠干扰（就像相邻车道会蹭到） 只有1、6、11这三个信道是不重叠的——这是铁律！ 2.4G信道分布示意： 信道: 1 2 3 4 5 6 7 8 9 10 11 |====|====|====|====|====|====|====|====|====|====|====| |_______________________| 信道 1 (中心频率 2412MHz) |_______________________| 信道 6 (中心频率 2437MHz) |_______________________| 信道 11 (中心频率 2462MHz) 说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰 5G频段就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。\n",
+  "keywords": [
+    "无线优化", "网络"
+  ],
+  "articleBody": "校园WiFi优化实战指南 从\"全员吐槽\"到\"流畅上网\"——一个真实校园WiFi改造项目的完整记录\n前言 写给谁看的？\n本文面向零基础网络管理员，假设你：\n听说过WiFi，但不知道信道、频宽是什么 拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手 遇到用户抱怨\"WiFi卡\"，不知道从哪排查 本文不讲什么？\n不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲实战中用得上的东西——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。\n项目概况速览\n项目 详情 场景 6层教学楼，60个教室 + 12个走廊 设备 锐捷AC WS6108 + 72台RG-AP730-L 用户数 880+ 终端同时连接 网络结构 管理VLAN 3997，用户VLAN 1101 优化前状态 连不上、卡顿、2.4G干扰严重 第一章：先搞懂这些基本概念 动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道\"血压\"、“血糖\"是什么指标一样。\n1.1 AP和AC是什么？ AP（Access Point）：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是发射无线信号，让手机/电脑能连上来。通常安装在教室天花板中间位置。\nAC（Wireless Access Controller）：无线控制器，可以理解为AP的\"大脑”。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。\n1.2 什么是信道？ 你可以把信道理解为WiFi的\"车道\"。\n我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。2.4G频段的频率范围是2400MHz~2483MHz，把这段频率切成多个\"车道\"，每个\"车道\"就是一个信道。\n2.4G频段的关键知识：\n信道宽度约20MHz 相邻信道会重叠干扰（就像相邻车道会蹭到） 只有1、6、11这三个信道是不重叠的——这是铁律！ 2.4G信道分布示意： 信道: 1 2 3 4 5 6 7 8 9 10 11 |====|====|====|====|====|====|====|====|====|====|====| |_______________________| 信道 1 (中心频率 2412MHz) |_______________________| 信道 6 (中心频率 2437MHz) |_______________________| 信道 11 (中心频率 2462MHz) 说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰 5G频段就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。\n5G信道分布示意： 5G低频段 (UNII-1/2A): 36 40 44 48 |====|====|====|====| 5G高频段 (UNII-3): 149 153 157 161 |====|====|====|====| 说明：5G各信道间有足够间隔，不会相互干扰 1.3 什么是频宽？ 频宽就是一个信道占据的频率宽度。\n20MHz频宽：速度一般，但穿墙能力强，适合干扰多的环境 40MHz频宽：速度更快，但只适合干扰少的环境 80MHz/160MHz：更快，但几乎只能在实验室这种纯净环境用 常见误区：很多人以为\"频宽越大越好\"，其实不对！\n就像车道，40MHz占2个信道，20MHz占1个信道。如果你在一个密集的环境里，周围都是WiFi信号，用40MHz反而会因为占用更多频谱而干扰更严重，速度反而不如20MHz。\n20MHz vs 40MHz 频宽对比： 20MHz 频宽： |信道 1| 占用 1 个信道，干扰范围小 40MHz 频宽： |信道 1 信道 6| 占用 2 个信道，干扰范围大，容易与相邻AP冲突 1.4 什么是RSSI？ RSSI（Received Signal Strength Indicator）：接收信号强度指示符，简单说就是你的手机能收到AP多少信号。\nRSSI是负数，越接近0信号越强 -30dBm ~ -50dBm：信号极强（满格） -50dBm ~ -70dBm：信号中等（2-3格） -70dBm以下：信号很弱，可能卡顿 锐捷设备特殊换算：锐捷的RSSI显示值和实际dBm有个换算关系：\n实际 dBm = 锐捷RSSI显示值 - 95 比如锐捷显示RSSI=26，实际就是 26-95 = -69dBm\n1.5 什么是CAPWAP隧道？ 用户手机连上WiFi后，AP需要和AC保持联系——AP要把用户的数据转发给AC，用户才能上网。这个AP和AC之间的加密传输通道就叫CAPWAP隧道。\nCAPWAP隧道原理： 终端设备 AP AC 互联网 📱 ─────无线信号────→ 📡 ──CAPWAP隧道──→ 🖥️ ──────→ 🌐 (加密传输) (集中转发) 说明：AP与AC之间通过CAPWAP隧道传输管理数据和用户业务数据 第二章：问题诊断——为什么WiFi卡？ 在动手优化前，我们得先搞清楚\"病根\"在哪。WiFi问题主要分两类：连不上和连上了但卡。\n2.1 问题一：用户连不上WiFi 可能原因排查清单：\n优先级 检查项 说明 1 AP是否在线 AC上能看到的AP数量对不对？指示灯是否正常？ 2 DHCP是否正常 终端能否获取到IP地址？检查VLAN 1101的DHCP池 3 无线服务是否开启 SSID是否启用？Radio是否UP？ 4 终端是否被限速/拒绝 是否触发了弱信号拒绝或终端数限制？ 快速诊断命令（锐捷AC）：\nbash# 查看所有AP在线状态 show ap status # 查看AP详细信息 show ap config global # 查看某个AP的运行状态 show ap running-config ap-name AP101 2.2 问题二：连上了但特别卡 可能原因排查清单：\n优先级 检查项 说明 1 2.4G干扰 用WiFi分析仪扫描，看看是否一片红 2 AP功率过大 信号越界，用户粘在远处弱信号AP上 3 终端密度过高 单AP接入用户太多，带宽不够分 4 AC上行口瓶颈 集中转发模式下，AC的1G口是总出口 我们项目遇到的具体问题：\n经过排查，发现以下几个核心问题：\n2.4G频段严重干扰 — 教学楼内大量AP的2.4G都用同样的信道，手机搜索到的网络\"挤成一团\" 5G频段未充分利用 — 很多老旧手机/设备默认连2.4G，不知道用5G更快 AP功率设置过大 — AP信号覆盖范围太大，导致隔壁教室的AP信号也很强，用户终端\"粘\"在远处AP上不切换 AC上行口成为瓶颈 — 880个用户全挤在一个1Gbps的AC上行口，高峰期就像节假日高速路堵车 集中转发瓶颈示意： 880个终端 AC (WS6108) 互联网 📱📱📱 🖥️ 🌐 📱📱📱 ──CAPWAP隧道──→ [1Gbps上行口] ─────────→ 📱📱📱 ⚠️ 瓶颈！ ... 说明：所有用户流量都经过AC的1Gbps上行口，高峰期严重拥塞 第三章：优化实战——一步一步来 动手前必看：改配置前必做两件事：1. show running-config 对比前后差异 2. 先在一台AP上测试，成功后再批量。\n下面开始正式优化。我会按实际操作顺序讲解，每一步都给出具体命令和参数。\n3.1 第一步：开启三射频 避坑：Radio 1 = 2.4G，Radio 2 = 5G低频，Radio 3 = 5G高频。很多设备的 Radio 3 默认没开，必须手动开启才能生效。\nRG-AP730-L是一款三射频AP，可以同时工作在3个频段：\nRadio 1：2.4G（b/g/n） Radio 2：5G低频（5.2GHz，ch36-48） Radio 3：5G高频（5.8GHz，ch149-161） 为什么要开三射频？\n三射频意味着增加了可用信道数量，就像从双向2车道变成双向6车道，能容纳更多AP同时工作而不互相干扰。\n锐捷命令格式（注意和文档旧格式的区别）：\nbash# 查看AP的Radio状态 show ap-config running | include radio # 查看所有AP在线情况 show ap-config summary # 进入单个AP配置 ap-config # 开启Radio 1（2.4G） enable-radio 1 # 开启Radio 2（5G低频） enable-radio 2 # 开启Radio 3（5G高频） enable-radio 3 避坑提示：Radio 3 默认可能没开启，一定要在配置中确认三个 Radio 都 UP。如果 Radio 1 不需要（如走廊AP），用 no enable-radio 1 关闭即可。\n3.2 第二步：信道规划 核心原则：相邻AP使用不重叠的信道，避免垂直干扰，2.4G信道规划（只用1/6/11）：\nAP名称 位置描述 radio1(2.4G) radio2(5G低频) radio3(5G高频) 频宽 2.4G功率 5GL功率 5GH功率 101 1楼教室 1 36 149 20MHz 30% 50% 50% 102 1楼教室 11 44 161 20MHz 30% 50% 50% 103 1楼教室 6 40 153 20MHz 30% 50% 50% 104 1楼教室 1 48 165 20MHz 30% 50% 50% 105 1楼教室 11 44 157 20MHz 30% 50% 50% 106 1楼教室 6 36 149 20MHz 30% 50% 50% 107 1楼教室 6 48 161 20MHz 30% 50% 50% 108 1楼教室 11 40 153 20MHz 30% 50% 50% 201 2楼教室 6 44 153 20MHz 30% 50% 50% 202 2楼教室 1 36 149 20MHz 30% 50% 50% 203 2楼教室 11 48 157 20MHz 30% 50% 50% 204 2楼教室 6 40 153 20MHz 30% 50% 50% 205 3楼教室 1 36 149 20MHz 30% 50% 50% 206 2楼教室 11 44 157 20MHz 30% 50% 50% 207 2楼教室 11 40 165 20MHz 30% 50% 50% 208 2楼教室 1 48 161 20MHz 30% 50% 50% 配置命令（以AP101为例）：\nbash# 进入AP配置 ap-config AP101 # Radio 1：2.4G radio 1 channel 1 # 2.4G用ch1 channel-width 20MHz exit # Radio 2：5G低频 radio 2 channel 36 # 5G低频用ch36 channel-width 20MHz exit # Radio 3：5G高频 radio 3 channel 149 # 5G高频用ch149 channel-width 20MHz exit write memory # 进入AP配置 ap-config AP101 # Radio 1：2.4G radio 1 channel 1 # 2.4G使用ch1 channel-width 20MHz exit # Radio 2：5G低频 radio 2 channel 36 # 5G低频使用ch36 channel-width 20MHz exit # Radio 3：5G高频 radio 3 channel 149 # 5G高频使用ch149 channel-width 20MHz exit 写入内存 3.3 第三步：频宽从40MHz降到20MHz 避坑提示：频宽设置是在 channel 命令之后单独执行的，不是 channel-width 而是需要在 radio 视图下单独配置命令确认。\n教室AP完整配置：\nbashap-config # Radio 1：2.4G radio 1 channel 1 channel-width 20MHz power local 30 coverage-area-control 10 sta-limit 15 assoc-rssi 26 response-rssi 15 exit # Radio 2：5G低频 radio 2 channel 36 channel-width 20MHz power local 65 coverage-area-control 15 sta-limit 25 assoc-rssi 24 response-rssi 15 exit # Radio 3：5G高频 radio 3 channel 149 channel-width 20MHz power local 65 coverage-area-control 15 sta-limit 25 assoc-rssi 24 response-rssi 15 exit write memory 避坑提示：40MHz在空旷环境（如操场、体育馆）可以用，但在教学楼这种密集环境，20MHz是更优选择。\n3.4 第四步：理解功率参数 重要澄清：power local 的值不是 dBm，而是线性百分比。\npower local 的真实含义：\n锐捷 power local = 线性 mW 百分比 换算公式：dBm = 10 × log10(百分比) + 20 power local 实际发射功率 覆盖范围 100 满功率（约100mW，+20dBm） 最远 70 约50mW（+17dBm） 适中 40 约16mW（+12dBm） 较近 30 约10mW（+10dBm） 近 为什么功率不能太大？\n如果AP功率设置过高，信号会\"越界\"覆盖到隔壁教室。结果就是：\n用户终端收到多个AP的信号差不多强 终端\"粘\"在一个AP上不切换 用户离AP很远，信号很弱，但还是连着那个AP，速度自然就卡 教室AP功率配置（覆盖本教室，不越界）：\nbashap-config # Radio 1：2.4G，30%功率够教室用 radio 1 power local 30 coverage-area-control 10 exit # Radio 2：5G低频，65%功率 radio 2 power local 65 coverage-area-control 15 exit # Radio 3：5G高频，65%功率 radio 3 power local 65 coverage-area-control 15 exit write memory 走廊AP功率配置（覆盖公共区域，2.4G关闭减少干扰）：\nbashap-config \u003c走廊AP名称\u003e # 走廊不需要2.4G，减少干扰 no enable-radio 1 # 5G用较低功率 radio 2 power local 40 coverage-area-control 12 exit radio 3 power local 40 coverage-area-control 12 exit write memory 教室AP覆盖范围控制： ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ │ 教室 A │ │ 教室 B │ │ 教室 C │ │ │ │ │ │ │ │ 📡 AP │ │ 📡 AP │ │ 📡 AP │ │ ~~~~~ │ │ ~~~~~ │ │ ~~~~~ │ │ 覆盖范围 │ │ 覆盖范围 │ │ 覆盖范围 │ └─────────────────┘ └─────────────────┘ └─────────────────┘ 说明：每个AP的覆盖范围刚好覆盖本教室，不越界到隔壁教室 3.5 第五步：彻底搞懂RSSI相关参数 这是最容易混淆的参数组合，assoc-rssi、response-rssi、coverage-area-control 三个参数作用于不同阶段，必须理解清楚。\n三个参数的本质区别：\n参数 作用阶段 触发条件 已连上的用户会被踢吗？ coverage-area-control 探测阶段 AP是否回应远处的Probe Request ❌ 不影响，已连的不管 response-rssi 关联请求阶段 AP是否接受关联请求 ❌ 已连的不管 assoc-rssi 连接保持阶段 已连用户的信号持续低于阈值 ✅ 会踢掉！ 信号强度与参数关系示意：\n信号强 ←————————————————————→ 信号弱 │ │ │ │ ├──────────────┤ │ │ │ 正常使用区域 │ │ │ │ │ │ │ assoc-rssi │ │ ← 已连用户低于这里就被踢！ │ 24(-71dBm) │ │ │ ↓ │ │ │ coverage-area-control │ │ 15(-80dBm) │ ← 低于这里连不上 │ response-rssi 15 │ 锐捷RSSI换算公式（必须记住）：\n实际 dBm = 锐捷RSSI值 - 95 锐捷RSSI 实际dBm 含义 30 -65dBm 信号很好 25 -70dBm 信号中等 20 -75dBm 信号偏弱 15 -80dBm 弱信号边界 5 -90dBm 极弱 实操配置（教室AP）：\nbashap-config # Radio 1：2.4G（assoc-rssi 26 = -69dBm，够严格） radio 1 assoc-rssi 26 response-rssi 15 exit # Radio 2：5G低频（assoc-rssi 24 = -71dBm） radio 2 assoc-rssi 24 response-rssi 15 exit # Radio 3：5G高频（assoc-rssi 24 = -71dBm） radio 3 assoc-rssi 24 response-rssi 15 exit write memory 3.6 第六步：特殊场景——弱信号设备（如IoT唱吧） 问题场景：\n跨楼层覆盖时，设备信号本身较弱（比如1楼的唱吧，连接2楼的AP，信号-70dBm左右）。此时如果 assoc-rssi 默认值是24（-71dBm），唱吧刚好在踢出线上，反复被踢→重连→又被踢。\n分析步骤：\nbash# 1. 先查看唱吧设备当前连接的AP和信号 show ac-config client by-ap-name # 2. 查看这个AP的配置 show ap-config running | include rssi # 3. 查到的数据： # assoc-rssi 24 radio 2 ← 对应 -71dBm，踢出线太严格了 # response-rssi 15 radio 2 ← 对应 -80dBm 解决方案：降低 assoc-rssi，允许弱信号设备保持连接\nbash# 针对唱吧所在AP（2F-Center）调整 ap-config 2F-Center # Radio 2 和 Radio 3 都要改 radio 2 assoc-rssi 15 # 从24降到15，允许信号-80dBm还在线 response-rssi 15 # 保持不变 power local 60 # 可选：适当提高功率增强信号 exit radio 3 assoc-rssi 15 response-rssi 15 power local 60 exit write memory 避坑提示：调 assoc-rssi 时，只改唱吧所在的AP，不要全局改，否则会降低其他区域的漫游质量。\n3.7 第七步：弱信号IoT设备特殊处理 如果网内有IoT设备、唱吧等弱信号设备跨楼层连接某个AP，需要对该AP单独放宽 assoc-rssi 阈值，同时适当提高功率：\nbashap-config radio 2 assoc-rssi 15 # 降低踢出阈值 response-rssi 15 # 保持 power local 60 # 适当提高功率 exit radio 3 assoc-rssi 15 response-rssi 15 power local 60 exit write memory 避坑提示：设备不会自动切换AP，修改功率后需要让设备重新断开WiFi再重连才能关联到新AP。\n3.8 第八步：AP掉线问题排查（AP103） 问题描述：\nAP103报错\"130 报文重传次数达到最大值\"，随后掉线。\n分析原因：\n错误码130通常是物理链路问题，不是AC配置问题。可能原因：\n网线损坏或水晶头松动 PoE供电不稳定 交换机端口故障 排查步骤：\nStep 1: 检查AP指示灯 - 绿色常亮：正常 - 橙色闪烁：PoE供电异常 - 灭灯：断电或网线断开 Step 2: 重新插拔网线 - 拔下AP端的网线，重新插紧 - 检查水晶头是否氧化或损坏 Step 3: 检查PoE供电 - 确认PoE交换机/ injector是否正常 - 测量电压是否在标准范围内（44-57V） Step 4: 检查交换机端口 - show interfaces GigabitEthernet 0/1 - 查看是否有CRC错误、丢包等 避坑提示：遇到AP掉线先查物理层，90%的问题是网线/PoE，不要急着改AC配置。\n3.9 第九步：集中转发切换本地转发（谨慎实施） 当前模式问题：集中转发\nbash# 查看当前转发模式 show wireless ap config global 集中转发模式下，所有用户流量都通过CAPWAP隧道→AC→互联网：\n880个用户抢1Gbps的AC上行口 AC成为性能瓶颈 网速高峰期约1MB/s（约8Mbps） 集中转发模式流量路径： 终端设备 AP AC (WS6108) 互联网 📱 ──无线──→ 📡 ─CAPWAP─→ 🖥️ [1Gbps口] ───→ 🌐 📱 ⚠️ 瓶颈 📱 ... (880个终端) 说明：所有用户流量都经过AC的1Gbps上行口转发 优化方案：切换本地转发\n本地转发模式下，用户流量直接从接入交换机出去，AC只负责AP管理：\nbash# 切换单个AP到本地转发模式（测试用） configure terminal ap 1 forwarding-mode local exit write memory 本地转发配置步骤：\nStep 1: 确认接入交换机放通VLAN 1101 - 交换机端口配置 trunk allow vlan 1101 Step 2: 在AC上为单个AP切换模式 - 先选1台AP测试，成功后再批量 Step 3: 验证功能 - 终端能获取IP - 终端能上网 - AC能看到AP在线 Step 4: 批量切换其他AP Step 5: 如果出问题，回退 - 改回 tunnel 模式即可恢复 本地转发模式流量路径： 终端设备 AP 接入交换机 互联网 📱 ──无线──→ 📡 ────→ 🔀 ──────────→ 🌐 📱 │ ↑ 📱 │ │ ... └─CAPWAP──┘ (仅管理流量) AC (WS6108) 🖥️ (只管AP管理) 说明：用户业务流量直接从接入交换机转发，AC只负责AP管理 本地转发后的预期效果：\n网速从1MB/s提升到5-10MB/s 峰值时段不再卡顿 AC负载大幅降低 3.10 第十步：配置文件导入注意事项 当需要批量导入AP配置时，需要注意以下格式要求：\n要求 说明 文件名 必须是 ap-config.text 编码 GBK编码（不能用UTF-8） 换行符 CRLF（Windows格式） 开头 必须以 ! 开头 结尾 必须以 end 结尾 配置文件示例结构：\n! ! Configuration script ! configure terminal ap 1 radio 1 channel 1 channel-width 20MHz power local 30 coverage-area-control 10 sta-limit 15 assoc-rssi 26 response-rssi 15 exit radio 2 channel 36 channel-width 20MHz power local 65 coverage-area-control 15 sta-limit 25 assoc-rssi 24 response-rssi 15 exit exit exit end 避坑提示：导入前务必确认编码格式！GBK编码错误会导致配置解析失败。\n第四章：验证与效果 4.1 配置验证命令 bash# 查看AP运行配置 show ap running-config ap-name AP101 # 查看AP信号强度 show ap counter radio ap-name AP101 # 查看终端关联情况 show wireless station ap-name AP101 # 查看射频状态 show ap config running ap-name AP101 4.2 优化前后对比 指标 优化前 优化后 WiFi连接 频繁断连/连不上 稳定连接 网页打开速度 10-30秒 1-3秒 视频播放 卡顿/缓冲 流畅播放 高峰期网速 约1MB/s 约1MB/s（待切本地转发） 2.4G干扰 严重 基本消除 5G利用率 低 显著提升 说明：高峰期网速暂时还是约1MB/s，是因为还在用集中转发模式。切换到本地转发后，预计能提升到5-10MB/s。\n第五章：避坑指南总结 5.1 常见误区 误区 真相 信道越多越好 2.4G只认1/6/11，其他都是干扰 频宽越大越好 密集环境20MHz比40MHz更稳定 功率越大覆盖越远越好 功率过大会造成终端粘性，反而更卡 assoc-rssi 和 response-rssi 是一回事 assoc-rssi 会踢已连用户，response-rssi 只管能否连进来 power local 是 dBm 值 power local 是百分比（0-100），不是 dBm coverage-area-control 越小越好 它控制AP不回应弱信号设备，越大=覆盖越远 改完转发模式就好了 tunnel local 优先级比全局开关还高！ AP掉线是AC的问题 90%是网线/PoE/交换机端口问题，不是AC配置 5.2 实际操作注意事项 ⚠️ 改配置前先 show running-config 备份 ⚠️ 批量修改前先选一台AP测试 ⚠️ 导入配置文件确认GBK编码 ⚠️ 改完要 write memory 保存 ⚠️ AP掉线先查物理层（网线/PoE） ⚠️ 弱信号拒绝要考虑终端兼容性 ⚠️ assoc-rssi 改了会踢已连用户，response-rssi 不会 ⚠️ 切转发模式前必查 tunnel local ⚠️ 切完转发模式WiFi不通，先查 WLAN 里的 tunnel local ⚠️ AP自动重连是正常行为，偶发掉线不用慌 ⚠️ Radio 1=2.4G，Radio 2\u00263=5G，命令格式是 ap-config 不是 ap 5.3 性能瓶颈排查路线图 用户报修 ↓ 是否连上WiFi？ ├─ 否 → AP在线吗？ │ ├─ 是 → DHCP正常吗？ │ │ ├─ 是 → 是否被弱信号拒绝？ │ │ │ ├─ 是 → 查 assoc-rssi / response-rssi │ │ │ └─ 否 → 查 AP射频是否开启 │ │ └─ 否 → 查 VLAN/网关/DHCP │ └─ 否 → 查PoE/网线/交换机端口 └─ 是 → 是否卡顿？ ├─ 否 → 正常，结束 └─ 是 → 2.4G干扰严重？ ├─ 是 → 引导用5G/调信道 └─ 否 → 功率过大终端粘性？ ├─ 是 → 降低功率 └─ 否 → AC上行口瓶颈？ └─ 考虑本地转发（但要先查tunnel local） 5.4 命令速查表 目的 命令 查看AP在线状态 show ap-config summary 查看AP配置 show ap-config running 查看终端关联 show ac-config client summary 查看CAPWAP隧道 show capwap state 查看转发模式 `show running-config 查看AP重启历史 show ap-config reboot history 改单个AP配置 ap-config 改WLAN配置 wlan-config 改全局转发模式 ac-controller → local-forwarding enable/no local-forwarding enable 附录：完整配置模板 以下是一台教室AP的完整配置模板，供参考：\nbash# ============================================ # RG-AP730-L 教室AP完整配置模板 # AP编号: XX # 位置: XX楼XX教室 # Radio对应：1=2.4G，2=5G低频，3=5G高频 # ============================================ ap-config AP101 ap-mac 8005.XXXX.XXXX # AP的MAC地址（产品贴纸上找） location 1F-Classroom-01 # 位置描述 # Radio 1: 2.4G radio 1 radio-type 802.11gn channel 1 channel-width 20MHz power local 30 coverage-area-control 10 sta-limit 15 assoc-rssi 26 response-rssi 15 enable-radio 1 exit # Radio 2: 5G低频 radio 2 radio-type 802.11an channel 36 channel-width 20MHz power local 65 coverage-area-control 15 sta-limit 25 assoc-rssi 24 response-rssi 15 enable-radio 2 exit # Radio 3: 5G高频 radio 3 radio-type 802.11an channel 149 channel-width 20MHz power local 65 coverage-area-control 15 sta-limit 25 assoc-rssi 24 response-rssi 15 enable-radio 3 exit write memory # ============================================ 走廊AP模板（关闭2.4G，减少干扰）：\nbashap-config AP-Hallway-01 ap-mac 8005.XXXX.XXXX location 1F-Hallway radio 1 no enable-radio 1 # 关闭2.4G exit radio 2 radio-type 802.11an channel 36 channel-width 20MHz power local 40 coverage-area-control 12 sta-limit 25 assoc-rssi 24 response-rssi 15 enable-radio 2 exit radio 3 radio-type 802.11an channel 149 channel-width 20MHz power local 40 coverage-area-control 12 sta-limit 25 assoc-rssi 24 response-rssi 15 enable-radio 3 exit write memory 结语 WiFi优化不是一蹴而就的，是一个持续观察、调整、验证的过程。本文记录了这次校园WiFi优化的核心步骤，但实际环境中可能还会遇到其他问题。\n这次优化的过程也踩了不少坑——改了转发模式差点全校断网、弱信号设备反复被踢、AP掉线以为AC坏了结果只是PoE松了……每一次踩坑都是一次学习，关键是把经验记录下来。\n建议的后续工作：\n持续观察AP的终端关联数和流量 用WiFi分析仪定期扫描信道使用情况 收集用户反馈，持续微调参数 如需切本地转发，提前确认交换机配置和审计要求 定期导出配置备份：show running-config 踩坑是成长的勋章，不是失败。\n文档版本：v2.0 更新时间：2026年5月 适用设备：锐捷AC WS6108 + RG-AP730-L 适用固件：RGOS 11.9(2)B1\n",
+  "wordCount" : "1761",
+  "inLanguage": "zh",
+  "datePublished": "2026-05-19T00:00:00Z",
+  "dateModified": "2026-05-19T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Wanzf"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Wanzf's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Wanzf&#39;s Blog (Alt + H)">Wanzf&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/about/" title="关于">
+                    <span>关于</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      校园WiFi优化实战指南
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-05-19 00:00:00 +0000 UTC'>2026年5月19日</span>&nbsp;·&nbsp;<span>9 分钟</span>&nbsp;·&nbsp;<span>Wanzf</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/wanzif/MyBlog/tree/main/content/posts/2026-5-19-%e6%a0%a1%e5%9b%adWiFi%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%e6%8c%87%e5%8d%97.md" rel="noopener noreferrer edit" target="_blank">编辑此页</a>
+    </span>
+
+</div>
+  </header> <details class="toc"  open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">目录</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%e6%a0%a1%e5%9b%adwifi%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%e6%8c%87%e5%8d%97" aria-label="校园WiFi优化实战指南">校园WiFi优化实战指南</a><ul>
+                    
+            <li>
+                <a href="#%e5%89%8d%e8%a8%80" aria-label="前言">前言</a></li>
+            <li>
+                <a href="#%e7%ac%ac%e4%b8%80%e7%ab%a0%e5%85%88%e6%90%9e%e6%87%82%e8%bf%99%e4%ba%9b%e5%9f%ba%e6%9c%ac%e6%a6%82%e5%bf%b5" aria-label="第一章：先搞懂这些基本概念">第一章：先搞懂这些基本概念</a><ul>
+                    
+            <li>
+                <a href="#11-ap%e5%92%8cac%e6%98%af%e4%bb%80%e4%b9%88" aria-label="1.1 AP和AC是什么？">1.1 AP和AC是什么？</a></li>
+            <li>
+                <a href="#12-%e4%bb%80%e4%b9%88%e6%98%af%e4%bf%a1%e9%81%93" aria-label="1.2 什么是信道？">1.2 什么是信道？</a></li>
+            <li>
+                <a href="#13-%e4%bb%80%e4%b9%88%e6%98%af%e9%a2%91%e5%ae%bd" aria-label="1.3 什么是频宽？">1.3 什么是频宽？</a></li>
+            <li>
+                <a href="#14-%e4%bb%80%e4%b9%88%e6%98%afrssi" aria-label="1.4 什么是RSSI？">1.4 什么是RSSI？</a></li>
+            <li>
+                <a href="#15-%e4%bb%80%e4%b9%88%e6%98%afcapwap%e9%9a%a7%e9%81%93" aria-label="1.5 什么是CAPWAP隧道？">1.5 什么是CAPWAP隧道？</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e7%ac%ac%e4%ba%8c%e7%ab%a0%e9%97%ae%e9%a2%98%e8%af%8a%e6%96%ad%e4%b8%ba%e4%bb%80%e4%b9%88wifi%e5%8d%a1" aria-label="第二章：问题诊断——为什么WiFi卡？">第二章：问题诊断——为什么WiFi卡？</a><ul>
+                    
+            <li>
+                <a href="#21-%e9%97%ae%e9%a2%98%e4%b8%80%e7%94%a8%e6%88%b7%e8%bf%9e%e4%b8%8d%e4%b8%8awifi" aria-label="2.1 问题一：用户连不上WiFi">2.1 问题一：用户连不上WiFi</a></li>
+            <li>
+                <a href="#22-%e9%97%ae%e9%a2%98%e4%ba%8c%e8%bf%9e%e4%b8%8a%e4%ba%86%e4%bd%86%e7%89%b9%e5%88%ab%e5%8d%a1" aria-label="2.2 问题二：连上了但特别卡">2.2 问题二：连上了但特别卡</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e7%ac%ac%e4%b8%89%e7%ab%a0%e4%bc%98%e5%8c%96%e5%ae%9e%e6%88%98%e4%b8%80%e6%ad%a5%e4%b8%80%e6%ad%a5%e6%9d%a5" aria-label="第三章：优化实战——一步一步来">第三章：优化实战——一步一步来</a><ul>
+                    
+            <li>
+                <a href="#31-%e7%ac%ac%e4%b8%80%e6%ad%a5%e5%bc%80%e5%90%af%e4%b8%89%e5%b0%84%e9%a2%91" aria-label="3.1 第一步：开启三射频">3.1 第一步：开启三射频</a></li>
+            <li>
+                <a href="#32-%e7%ac%ac%e4%ba%8c%e6%ad%a5%e4%bf%a1%e9%81%93%e8%a7%84%e5%88%92" aria-label="3.2 第二步：信道规划">3.2 第二步：信道规划</a></li>
+            <li>
+                <a href="#33-%e7%ac%ac%e4%b8%89%e6%ad%a5%e9%a2%91%e5%ae%bd%e4%bb%8e40mhz%e9%99%8d%e5%88%b020mhz" aria-label="3.3 第三步：频宽从40MHz降到20MHz">3.3 第三步：频宽从40MHz降到20MHz</a></li>
+            <li>
+                <a href="#34-%e7%ac%ac%e5%9b%9b%e6%ad%a5%e7%90%86%e8%a7%a3%e5%8a%9f%e7%8e%87%e5%8f%82%e6%95%b0" aria-label="3.4 第四步：理解功率参数">3.4 第四步：理解功率参数</a></li>
+            <li>
+                <a href="#35-%e7%ac%ac%e4%ba%94%e6%ad%a5%e5%bd%bb%e5%ba%95%e6%90%9e%e6%87%82rssi%e7%9b%b8%e5%85%b3%e5%8f%82%e6%95%b0" aria-label="3.5 第五步：彻底搞懂RSSI相关参数">3.5 第五步：彻底搞懂RSSI相关参数</a></li>
+            <li>
+                <a href="#36-%e7%ac%ac%e5%85%ad%e6%ad%a5%e7%89%b9%e6%ae%8a%e5%9c%ba%e6%99%af%e5%bc%b1%e4%bf%a1%e5%8f%b7%e8%ae%be%e5%a4%87%e5%a6%82iot%e5%94%b1%e5%90%a7" aria-label="3.6 第六步：特殊场景——弱信号设备（如IoT唱吧）">3.6 第六步：特殊场景——弱信号设备（如IoT唱吧）</a></li>
+            <li>
+                <a href="#37-%e7%ac%ac%e4%b8%83%e6%ad%a5%e5%bc%b1%e4%bf%a1%e5%8f%b7iot%e8%ae%be%e5%a4%87%e7%89%b9%e6%ae%8a%e5%a4%84%e7%90%86" aria-label="3.7 第七步：弱信号IoT设备特殊处理">3.7 第七步：弱信号IoT设备特殊处理</a></li>
+            <li>
+                <a href="#38-%e7%ac%ac%e5%85%ab%e6%ad%a5ap%e6%8e%89%e7%ba%bf%e9%97%ae%e9%a2%98%e6%8e%92%e6%9f%a5ap103" aria-label="3.8 第八步：AP掉线问题排查（AP103）">3.8 第八步：AP掉线问题排查（AP103）</a></li>
+            <li>
+                <a href="#39-%e7%ac%ac%e4%b9%9d%e6%ad%a5%e9%9b%86%e4%b8%ad%e8%bd%ac%e5%8f%91%e5%88%87%e6%8d%a2%e6%9c%ac%e5%9c%b0%e8%bd%ac%e5%8f%91%e8%b0%a8%e6%85%8e%e5%ae%9e%e6%96%bd" aria-label="3.9 第九步：集中转发切换本地转发（谨慎实施）">3.9 第九步：集中转发切换本地转发（谨慎实施）</a></li>
+            <li>
+                <a href="#310-%e7%ac%ac%e5%8d%81%e6%ad%a5%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e5%af%bc%e5%85%a5%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9" aria-label="3.10 第十步：配置文件导入注意事项">3.10 第十步：配置文件导入注意事项</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e7%ac%ac%e5%9b%9b%e7%ab%a0%e9%aa%8c%e8%af%81%e4%b8%8e%e6%95%88%e6%9e%9c" aria-label="第四章：验证与效果">第四章：验证与效果</a><ul>
+                    
+            <li>
+                <a href="#41-%e9%85%8d%e7%bd%ae%e9%aa%8c%e8%af%81%e5%91%bd%e4%bb%a4" aria-label="4.1 配置验证命令">4.1 配置验证命令</a></li>
+            <li>
+                <a href="#42-%e4%bc%98%e5%8c%96%e5%89%8d%e5%90%8e%e5%af%b9%e6%af%94" aria-label="4.2 优化前后对比">4.2 优化前后对比</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e7%ac%ac%e4%ba%94%e7%ab%a0%e9%81%bf%e5%9d%91%e6%8c%87%e5%8d%97%e6%80%bb%e7%bb%93" aria-label="第五章：避坑指南总结">第五章：避坑指南总结</a><ul>
+                    
+            <li>
+                <a href="#51-%e5%b8%b8%e8%a7%81%e8%af%af%e5%8c%ba" aria-label="5.1 常见误区">5.1 常见误区</a></li>
+            <li>
+                <a href="#52-%e5%ae%9e%e9%99%85%e6%93%8d%e4%bd%9c%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9" aria-label="5.2 实际操作注意事项">5.2 实际操作注意事项</a></li>
+            <li>
+                <a href="#53-%e6%80%a7%e8%83%bd%e7%93%b6%e9%a2%88%e6%8e%92%e6%9f%a5%e8%b7%af%e7%ba%bf%e5%9b%be" aria-label="5.3 性能瓶颈排查路线图">5.3 性能瓶颈排查路线图</a></li>
+            <li>
+                <a href="#54-%e5%91%bd%e4%bb%a4%e9%80%9f%e6%9f%a5%e8%a1%a8" aria-label="5.4 命令速查表">5.4 命令速查表</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e9%99%84%e5%bd%95%e5%ae%8c%e6%95%b4%e9%85%8d%e7%bd%ae%e6%a8%a1%e6%9d%bf" aria-label="附录：完整配置模板">附录：完整配置模板</a></li>
+            <li>
+                <a href="#%e7%bb%93%e8%af%ad" aria-label="结语">结语</a>
+            </li>
+        </ul>
+        </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><h1 id="校园wifi优化实战指南">校园WiFi优化实战指南<a hidden class="anchor" aria-hidden="true" href="#校园wifi优化实战指南">#</a></h1>
+<blockquote>
+<p>从&quot;全员吐槽&quot;到&quot;流畅上网&quot;——一个真实校园WiFi改造项目的完整记录</p>
+</blockquote>
+<hr>
+<h2 id="前言">前言<a hidden class="anchor" aria-hidden="true" href="#前言">#</a></h2>
+<p><strong>写给谁看的？</strong></p>
+<p>本文面向<strong>零基础网络管理员</strong>，假设你：</p>
+<ul>
+<li>听说过WiFi，但不知道信道、频宽是什么</li>
+<li>拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手</li>
+<li>遇到用户抱怨&quot;WiFi卡&quot;，不知道从哪排查</li>
+</ul>
+<p><strong>本文不讲什么？</strong></p>
+<p>不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲<strong>实战中用得上的东西</strong>——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。</p>
+<p><strong>项目概况速览</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">项目</th>
+          <th style="text-align: left">详情</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">场景</td>
+          <td style="text-align: left">6层教学楼，60个教室 + 12个走廊</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">设备</td>
+          <td style="text-align: left">锐捷AC WS6108 + 72台RG-AP730-L</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">用户数</td>
+          <td style="text-align: left">880+ 终端同时连接</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">网络结构</td>
+          <td style="text-align: left">管理VLAN 3997，用户VLAN 1101</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">优化前状态</td>
+          <td style="text-align: left">连不上、卡顿、2.4G干扰严重</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="第一章先搞懂这些基本概念">第一章：先搞懂这些基本概念<a hidden class="anchor" aria-hidden="true" href="#第一章先搞懂这些基本概念">#</a></h2>
+<p>动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道&quot;血压&quot;、&ldquo;血糖&quot;是什么指标一样。</p>
+<h3 id="11-ap和ac是什么">1.1 AP和AC是什么？<a hidden class="anchor" aria-hidden="true" href="#11-ap和ac是什么">#</a></h3>
+<p><strong>AP（Access Point）</strong>：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是<strong>发射无线信号，让手机/电脑能连上来</strong>。通常安装在教室天花板中间位置。</p>
+<p><strong>AC（Wireless Access Controller）</strong>：无线控制器，可以理解为AP的&quot;大脑&rdquo;。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。</p>
+<h3 id="12-什么是信道">1.2 什么是信道？<a hidden class="anchor" aria-hidden="true" href="#12-什么是信道">#</a></h3>
+<p>你可以把信道理解为<strong>WiFi的&quot;车道&quot;</strong>。</p>
+<p>我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。<strong>2.4G频段</strong>的频率范围是2400MHz~2483MHz，把这段频率切成多个&quot;车道&quot;，每个&quot;车道&quot;就是一个信道。</p>
+<p><strong>2.4G频段的关键知识：</strong></p>
+<ul>
+<li>信道宽度约20MHz</li>
+<li>相邻信道会重叠干扰（就像相邻车道会蹭到）</li>
+<li><strong>只有1、6、11这三个信道是不重叠的</strong>——这是铁律！</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2.4G信道分布示意：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">信道:  1    2    3    4    5    6    7    8    9   10   11
+</span></span><span class="line"><span class="cl">      |====|====|====|====|====|====|====|====|====|====|====|
+</span></span><span class="line"><span class="cl">      |_______________________|
+</span></span><span class="line"><span class="cl">              信道 1 (中心频率 2412MHz)
+</span></span><span class="line"><span class="cl">                |_______________________|
+</span></span><span class="line"><span class="cl">                        信道 6 (中心频率 2437MHz)
+</span></span><span class="line"><span class="cl">                          |_______________________|
+</span></span><span class="line"><span class="cl">                                  信道 11 (中心频率 2462MHz)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰
+</span></span></code></pre></div><p><strong>5G频段</strong>就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">5G信道分布示意：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">5G低频段 (UNII-1/2A):
+</span></span><span class="line"><span class="cl">  36   40   44   48
+</span></span><span class="line"><span class="cl">  |====|====|====|====|
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">5G高频段 (UNII-3):
+</span></span><span class="line"><span class="cl"> 149  153  157  161
+</span></span><span class="line"><span class="cl">  |====|====|====|====|
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">说明：5G各信道间有足够间隔，不会相互干扰
+</span></span></code></pre></div><h3 id="13-什么是频宽">1.3 什么是频宽？<a hidden class="anchor" aria-hidden="true" href="#13-什么是频宽">#</a></h3>
+<p>频宽就是一个信道占据的<strong>频率宽度</strong>。</p>
+<ul>
+<li><strong>20MHz频宽</strong>：速度一般，但穿墙能力强，适合干扰多的环境</li>
+<li><strong>40MHz频宽</strong>：速度更快，但只适合干扰少的环境</li>
+<li><strong>80MHz/160MHz</strong>：更快，但几乎只能在实验室这种纯净环境用</li>
+</ul>
+<p><strong>常见误区</strong>：很多人以为&quot;频宽越大越好&quot;，其实不对！</p>
+<p>就像车道，40MHz占2个信道，20MHz占1个信道。如果你在一个密集的环境里，周围都是WiFi信号，用40MHz反而会因为占用更多频谱而<strong>干扰更严重</strong>，速度反而不如20MHz。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">20MHz vs 40MHz 频宽对比：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">20MHz 频宽：
+</span></span><span class="line"><span class="cl">  |信道 1|
+</span></span><span class="line"><span class="cl">  占用 1 个信道，干扰范围小
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">40MHz 频宽：
+</span></span><span class="line"><span class="cl">  |信道 1  信道 6|
+</span></span><span class="line"><span class="cl">  占用 2 个信道，干扰范围大，容易与相邻AP冲突
+</span></span></code></pre></div><h3 id="14-什么是rssi">1.4 什么是RSSI？<a hidden class="anchor" aria-hidden="true" href="#14-什么是rssi">#</a></h3>
+<p><strong>RSSI（Received Signal Strength Indicator）</strong>：接收信号强度指示符，简单说就是<strong>你的手机能收到AP多少信号</strong>。</p>
+<ul>
+<li>RSSI是负数，越接近0信号越强</li>
+<li>-30dBm ~ -50dBm：信号极强（满格）</li>
+<li>-50dBm ~ -70dBm：信号中等（2-3格）</li>
+<li>-70dBm以下：信号很弱，可能卡顿</li>
+</ul>
+<blockquote>
+<p><strong>锐捷设备特殊换算</strong>：锐捷的RSSI显示值和实际dBm有个换算关系：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">实际 dBm = 锐捷RSSI显示值 - 95
+</span></span></code></pre></div><p>比如锐捷显示RSSI=26，实际就是 26-95 = -69dBm</p>
+</blockquote>
+<h3 id="15-什么是capwap隧道">1.5 什么是CAPWAP隧道？<a hidden class="anchor" aria-hidden="true" href="#15-什么是capwap隧道">#</a></h3>
+<p>用户手机连上WiFi后，AP需要和AC保持联系——AP要把用户的数据转发给AC，用户才能上网。这个<strong>AP和AC之间的加密传输通道</strong>就叫CAPWAP隧道。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">CAPWAP隧道原理：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  终端设备                AP                  AC              互联网
+</span></span><span class="line"><span class="cl">    📱  ─────无线信号────→  📡  ──CAPWAP隧道──→  🖥️  ──────→  🌐
+</span></span><span class="line"><span class="cl">                           (加密传输)          (集中转发)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">说明：AP与AC之间通过CAPWAP隧道传输管理数据和用户业务数据
+</span></span></code></pre></div><hr>
+<h2 id="第二章问题诊断为什么wifi卡">第二章：问题诊断——为什么WiFi卡？<a hidden class="anchor" aria-hidden="true" href="#第二章问题诊断为什么wifi卡">#</a></h2>
+<p>在动手优化前，我们得先搞清楚&quot;病根&quot;在哪。WiFi问题主要分两类：<strong>连不上</strong>和<strong>连上了但卡</strong>。</p>
+<h3 id="21-问题一用户连不上wifi">2.1 问题一：用户连不上WiFi<a hidden class="anchor" aria-hidden="true" href="#21-问题一用户连不上wifi">#</a></h3>
+<p><strong>可能原因排查清单：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">优先级</th>
+          <th style="text-align: left">检查项</th>
+          <th style="text-align: left">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">AP是否在线</td>
+          <td style="text-align: left">AC上能看到的AP数量对不对？指示灯是否正常？</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">2</td>
+          <td style="text-align: left">DHCP是否正常</td>
+          <td style="text-align: left">终端能否获取到IP地址？检查VLAN 1101的DHCP池</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">3</td>
+          <td style="text-align: left">无线服务是否开启</td>
+          <td style="text-align: left">SSID是否启用？Radio是否UP？</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">4</td>
+          <td style="text-align: left">终端是否被限速/拒绝</td>
+          <td style="text-align: left">是否触发了弱信号拒绝或终端数限制？</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>快速诊断命令（锐捷AC）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 查看所有AP在线状态
+</span></span><span class="line"><span class="cl">show ap status
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看AP详细信息
+</span></span><span class="line"><span class="cl">show ap config global
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看某个AP的运行状态
+</span></span><span class="line"><span class="cl">show ap running-config ap-name AP101
+</span></span></code></pre></div><h3 id="22-问题二连上了但特别卡">2.2 问题二：连上了但特别卡<a hidden class="anchor" aria-hidden="true" href="#22-问题二连上了但特别卡">#</a></h3>
+<p><strong>可能原因排查清单：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">优先级</th>
+          <th style="text-align: left">检查项</th>
+          <th style="text-align: left">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">1</td>
+          <td style="text-align: left">2.4G干扰</td>
+          <td style="text-align: left">用WiFi分析仪扫描，看看是否一片红</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">2</td>
+          <td style="text-align: left">AP功率过大</td>
+          <td style="text-align: left">信号越界，用户粘在远处弱信号AP上</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">3</td>
+          <td style="text-align: left">终端密度过高</td>
+          <td style="text-align: left">单AP接入用户太多，带宽不够分</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">4</td>
+          <td style="text-align: left">AC上行口瓶颈</td>
+          <td style="text-align: left">集中转发模式下，AC的1G口是总出口</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>我们项目遇到的具体问题：</strong></p>
+<p>经过排查，发现以下几个核心问题：</p>
+<ol>
+<li><strong>2.4G频段严重干扰</strong> — 教学楼内大量AP的2.4G都用同样的信道，手机搜索到的网络&quot;挤成一团&quot;</li>
+<li><strong>5G频段未充分利用</strong> — 很多老旧手机/设备默认连2.4G，不知道用5G更快</li>
+<li><strong>AP功率设置过大</strong> — AP信号覆盖范围太大，导致隔壁教室的AP信号也很强，用户终端&quot;粘&quot;在远处AP上不切换</li>
+<li><strong>AC上行口成为瓶颈</strong> — 880个用户全挤在一个1Gbps的AC上行口，高峰期就像节假日高速路堵车</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">集中转发瓶颈示意：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  880个终端                    AC (WS6108)                  互联网
+</span></span><span class="line"><span class="cl">    📱📱📱                      🖥️                           🌐
+</span></span><span class="line"><span class="cl">    📱📱📱  ──CAPWAP隧道──→   [1Gbps上行口]  ─────────→
+</span></span><span class="line"><span class="cl">    📱📱📱                      ⚠️ 瓶颈！
+</span></span><span class="line"><span class="cl">    ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">说明：所有用户流量都经过AC的1Gbps上行口，高峰期严重拥塞
+</span></span></code></pre></div><hr>
+<h2 id="第三章优化实战一步一步来">第三章：优化实战——一步一步来<a hidden class="anchor" aria-hidden="true" href="#第三章优化实战一步一步来">#</a></h2>
+<blockquote>
+<p><strong>动手前必看</strong>：改配置前必做两件事：1. <code>show running-config</code> 对比前后差异 2. 先在一台AP上测试，成功后再批量。</p>
+</blockquote>
+<p>下面开始正式优化。我会按<strong>实际操作顺序</strong>讲解，每一步都给出具体命令和参数。</p>
+<hr>
+<h3 id="31-第一步开启三射频">3.1 第一步：开启三射频<a hidden class="anchor" aria-hidden="true" href="#31-第一步开启三射频">#</a></h3>
+<blockquote>
+<p><strong>避坑</strong>：Radio 1 = 2.4G，Radio 2 = 5G低频，Radio 3 = 5G高频。很多设备的 Radio 3 默认没开，必须手动开启才能生效。</p>
+</blockquote>
+<p>RG-AP730-L是一款<strong>三射频AP</strong>，可以同时工作在3个频段：</p>
+<ul>
+<li>Radio 1：2.4G（b/g/n）</li>
+<li>Radio 2：5G低频（5.2GHz，ch36-48）</li>
+<li>Radio 3：5G高频（5.8GHz，ch149-161）</li>
+</ul>
+<p><strong>为什么要开三射频？</strong></p>
+<p>三射频意味着<strong>增加了可用信道数量</strong>，就像从双向2车道变成双向6车道，能容纳更多AP同时工作而不互相干扰。</p>
+<p><strong>锐捷命令格式（注意和文档旧格式的区别）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 查看AP的Radio状态
+</span></span><span class="line"><span class="cl">show ap-config running &lt;AP名称&gt; | include radio
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看所有AP在线情况
+</span></span><span class="line"><span class="cl">show ap-config summary
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 进入单个AP配置
+</span></span><span class="line"><span class="cl">ap-config &lt;AP名称&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 开启Radio 1（2.4G）
+</span></span><span class="line"><span class="cl">enable-radio 1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 开启Radio 2（5G低频）
+</span></span><span class="line"><span class="cl">enable-radio 2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 开启Radio 3（5G高频）
+</span></span><span class="line"><span class="cl">enable-radio 3
+</span></span></code></pre></div><blockquote>
+<p><strong>避坑提示</strong>：Radio 3 默认可能没开启，一定要在配置中确认三个 Radio 都 UP。如果 Radio 1 不需要（如走廊AP），用 <code>no enable-radio 1</code> 关闭即可。</p>
+</blockquote>
+<h3 id="32-第二步信道规划">3.2 第二步：信道规划<a hidden class="anchor" aria-hidden="true" href="#32-第二步信道规划">#</a></h3>
+<p><strong>核心原则</strong>：相邻AP使用不重叠的信道，避免垂直干扰，<strong>2.4G信道规划（只用1/6/11）：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>AP名称</th>
+          <th>位置描述</th>
+          <th>radio1(2.4G)</th>
+          <th>radio2(5G低频)</th>
+          <th>radio3(5G高频)</th>
+          <th>频宽</th>
+          <th>2.4G功率</th>
+          <th>5GL功率</th>
+          <th>5GH功率</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>101</td>
+          <td>1楼教室</td>
+          <td>1</td>
+          <td>36</td>
+          <td>149</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>102</td>
+          <td>1楼教室</td>
+          <td>11</td>
+          <td>44</td>
+          <td>161</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>103</td>
+          <td>1楼教室</td>
+          <td>6</td>
+          <td>40</td>
+          <td>153</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>104</td>
+          <td>1楼教室</td>
+          <td>1</td>
+          <td>48</td>
+          <td>165</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>105</td>
+          <td>1楼教室</td>
+          <td>11</td>
+          <td>44</td>
+          <td>157</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>106</td>
+          <td>1楼教室</td>
+          <td>6</td>
+          <td>36</td>
+          <td>149</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>107</td>
+          <td>1楼教室</td>
+          <td>6</td>
+          <td>48</td>
+          <td>161</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>108</td>
+          <td>1楼教室</td>
+          <td>11</td>
+          <td>40</td>
+          <td>153</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>201</td>
+          <td>2楼教室</td>
+          <td>6</td>
+          <td>44</td>
+          <td>153</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>202</td>
+          <td>2楼教室</td>
+          <td>1</td>
+          <td>36</td>
+          <td>149</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>203</td>
+          <td>2楼教室</td>
+          <td>11</td>
+          <td>48</td>
+          <td>157</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>204</td>
+          <td>2楼教室</td>
+          <td>6</td>
+          <td>40</td>
+          <td>153</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>205</td>
+          <td>3楼教室</td>
+          <td>1</td>
+          <td>36</td>
+          <td>149</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>206</td>
+          <td>2楼教室</td>
+          <td>11</td>
+          <td>44</td>
+          <td>157</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>207</td>
+          <td>2楼教室</td>
+          <td>11</td>
+          <td>40</td>
+          <td>165</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+      <tr>
+          <td>208</td>
+          <td>2楼教室</td>
+          <td>1</td>
+          <td>48</td>
+          <td>161</td>
+          <td>20MHz</td>
+          <td>30%</td>
+          <td>50%</td>
+          <td>50%</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>配置命令（以AP101为例）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 进入AP配置
+</span></span><span class="line"><span class="cl">ap-config AP101
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 1：2.4G
+</span></span><span class="line"><span class="cl">radio 1
+</span></span><span class="line"><span class="cl"> channel 1                    # 2.4G用ch1
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 2：5G低频
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> channel 36                   # 5G低频用ch36
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 3：5G高频
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> channel 149                  # 5G高频用ch149
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span><span class="line"><span class="cl"># 进入AP配置
+</span></span><span class="line"><span class="cl">ap-config AP101
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 1：2.4G
+</span></span><span class="line"><span class="cl">radio 1
+</span></span><span class="line"><span class="cl"> channel 1                    # 2.4G使用ch1
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 2：5G低频
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> channel 36                   # 5G低频使用ch36
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 3：5G高频
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> channel 149                  # 5G高频使用ch149
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">写入内存
+</span></span></code></pre></div><h3 id="33-第三步频宽从40mhz降到20mhz">3.3 第三步：频宽从40MHz降到20MHz<a hidden class="anchor" aria-hidden="true" href="#33-第三步频宽从40mhz降到20mhz">#</a></h3>
+<blockquote>
+<p><strong>避坑提示</strong>：频宽设置是在 <code>channel</code> 命令之后单独执行的，不是 <code>channel-width</code> 而是需要在 radio 视图下单独配置命令确认。</p>
+</blockquote>
+<p><strong>教室AP完整配置：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bashap-config &lt;AP名称&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 1：2.4G
+</span></span><span class="line"><span class="cl">radio 1
+</span></span><span class="line"><span class="cl"> channel 1
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> power local 30
+</span></span><span class="line"><span class="cl"> coverage-area-control 10
+</span></span><span class="line"><span class="cl"> sta-limit 15
+</span></span><span class="line"><span class="cl"> assoc-rssi 26
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 2：5G低频
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> channel 36
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> power local 65
+</span></span><span class="line"><span class="cl"> coverage-area-control 15
+</span></span><span class="line"><span class="cl"> sta-limit 25
+</span></span><span class="line"><span class="cl"> assoc-rssi 24
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 3：5G高频
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> channel 149
+</span></span><span class="line"><span class="cl"> channel-width 20MHz
+</span></span><span class="line"><span class="cl"> power local 65
+</span></span><span class="line"><span class="cl"> coverage-area-control 15
+</span></span><span class="line"><span class="cl"> sta-limit 25
+</span></span><span class="line"><span class="cl"> assoc-rssi 24
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span></code></pre></div><blockquote>
+<p><strong>避坑提示</strong>：40MHz在空旷环境（如操场、体育馆）可以用，但在教学楼这种密集环境，20MHz是更优选择。</p>
+</blockquote>
+<h3 id="34-第四步理解功率参数">3.4 第四步：理解功率参数<a hidden class="anchor" aria-hidden="true" href="#34-第四步理解功率参数">#</a></h3>
+<blockquote>
+<p><strong>重要澄清</strong>：<code>power local</code> 的值不是 dBm，而是<strong>线性百分比</strong>。</p>
+</blockquote>
+<p><strong>power local 的真实含义：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">锐捷 power local = 线性 mW 百分比
+</span></span><span class="line"><span class="cl">换算公式：dBm = 10 × log10(百分比) + 20
+</span></span></code></pre></div><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">power local</th>
+          <th style="text-align: left">实际发射功率</th>
+          <th style="text-align: left">覆盖范围</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">100</td>
+          <td style="text-align: left">满功率（约100mW，+20dBm）</td>
+          <td style="text-align: left">最远</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">70</td>
+          <td style="text-align: left">约50mW（+17dBm）</td>
+          <td style="text-align: left">适中</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">40</td>
+          <td style="text-align: left">约16mW（+12dBm）</td>
+          <td style="text-align: left">较近</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">30</td>
+          <td style="text-align: left">约10mW（+10dBm）</td>
+          <td style="text-align: left">近</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>为什么功率不能太大？</strong></p>
+<p>如果AP功率设置过高，信号会&quot;越界&quot;覆盖到隔壁教室。结果就是：</p>
+<ul>
+<li>用户终端收到多个AP的信号差不多强</li>
+<li>终端&quot;粘&quot;在一个AP上不切换</li>
+<li>用户离AP很远，信号很弱，但还是连着那个AP，速度自然就卡</li>
+</ul>
+<p><strong>教室AP功率配置（覆盖本教室，不越界）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bashap-config &lt;AP名称&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 1：2.4G，30%功率够教室用
+</span></span><span class="line"><span class="cl">radio 1
+</span></span><span class="line"><span class="cl"> power local 30
+</span></span><span class="line"><span class="cl"> coverage-area-control 10
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 2：5G低频，65%功率
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> power local 65
+</span></span><span class="line"><span class="cl"> coverage-area-control 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 3：5G高频，65%功率
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> power local 65
+</span></span><span class="line"><span class="cl"> coverage-area-control 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span></code></pre></div><p><strong>走廊AP功率配置（覆盖公共区域，2.4G关闭减少干扰）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bashap-config &lt;走廊AP名称&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 走廊不需要2.4G，减少干扰
+</span></span><span class="line"><span class="cl">no enable-radio 1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 5G用较低功率
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> power local 40
+</span></span><span class="line"><span class="cl"> coverage-area-control 12
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> power local 40
+</span></span><span class="line"><span class="cl"> coverage-area-control 12
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span><span class="line"><span class="cl">教室AP覆盖范围控制：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+</span></span><span class="line"><span class="cl">  │    教室 A       │  │    教室 B       │  │    教室 C       │
+</span></span><span class="line"><span class="cl">  │                 │  │                 │  │                 │
+</span></span><span class="line"><span class="cl">  │      📡 AP      │  │      📡 AP      │  │      📡 AP      │
+</span></span><span class="line"><span class="cl">  │     ~~~~~       │  │     ~~~~~       │  │     ~~~~~       │
+</span></span><span class="line"><span class="cl">  │    覆盖范围     │  │    覆盖范围     │  │    覆盖范围     │
+</span></span><span class="line"><span class="cl">  └─────────────────┘  └─────────────────┘  └─────────────────┘
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">说明：每个AP的覆盖范围刚好覆盖本教室，不越界到隔壁教室
+</span></span></code></pre></div><h3 id="35-第五步彻底搞懂rssi相关参数">3.5 第五步：彻底搞懂RSSI相关参数<a hidden class="anchor" aria-hidden="true" href="#35-第五步彻底搞懂rssi相关参数">#</a></h3>
+<blockquote>
+<p><strong>这是最容易混淆的参数组合</strong>，assoc-rssi、response-rssi、coverage-area-control 三个参数作用于不同阶段，必须理解清楚。</p>
+</blockquote>
+<p><strong>三个参数的本质区别：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">参数</th>
+          <th style="text-align: left">作用阶段</th>
+          <th style="text-align: left">触发条件</th>
+          <th style="text-align: left">已连上的用户会被踢吗？</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">coverage-area-control</td>
+          <td style="text-align: left"><strong>探测阶段</strong></td>
+          <td style="text-align: left">AP是否回应远处的Probe Request</td>
+          <td style="text-align: left">❌ 不影响，已连的不管</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">response-rssi</td>
+          <td style="text-align: left"><strong>关联请求阶段</strong></td>
+          <td style="text-align: left">AP是否接受关联请求</td>
+          <td style="text-align: left">❌ 已连的不管</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">assoc-rssi</td>
+          <td style="text-align: left"><strong>连接保持阶段</strong></td>
+          <td style="text-align: left">已连用户的信号持续低于阈值</td>
+          <td style="text-align: left">✅ <strong>会踢掉！</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>信号强度与参数关系示意：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">信号强 ←————————————————————→ 信号弱
+</span></span><span class="line"><span class="cl">  │              │         │             │
+</span></span><span class="line"><span class="cl">  ├──────────────┤         │             │
+</span></span><span class="line"><span class="cl">  │  正常使用区域           │             │
+</span></span><span class="line"><span class="cl">  │              │         │             │
+</span></span><span class="line"><span class="cl">  │         assoc-rssi     │             │ ← 已连用户低于这里就被踢！
+</span></span><span class="line"><span class="cl">  │         24(-71dBm)     │             │
+</span></span><span class="line"><span class="cl">  │              ↓         │             │
+</span></span><span class="line"><span class="cl">  │              coverage-area-control    │
+</span></span><span class="line"><span class="cl">  │              15(-80dBm)              │ ← 低于这里连不上
+</span></span><span class="line"><span class="cl">  │              response-rssi 15         │
+</span></span></code></pre></div><p><strong>锐捷RSSI换算公式（必须记住）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">实际 dBm = 锐捷RSSI值 - 95
+</span></span></code></pre></div><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">锐捷RSSI</th>
+          <th style="text-align: left">实际dBm</th>
+          <th style="text-align: left">含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">30</td>
+          <td style="text-align: left">-65dBm</td>
+          <td style="text-align: left">信号很好</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">25</td>
+          <td style="text-align: left">-70dBm</td>
+          <td style="text-align: left">信号中等</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">20</td>
+          <td style="text-align: left">-75dBm</td>
+          <td style="text-align: left">信号偏弱</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">15</td>
+          <td style="text-align: left">-80dBm</td>
+          <td style="text-align: left">弱信号边界</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">5</td>
+          <td style="text-align: left">-90dBm</td>
+          <td style="text-align: left">极弱</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>实操配置（教室AP）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bashap-config &lt;AP名称&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 1：2.4G（assoc-rssi 26 = -69dBm，够严格）
+</span></span><span class="line"><span class="cl">radio 1
+</span></span><span class="line"><span class="cl"> assoc-rssi 26
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 2：5G低频（assoc-rssi 24 = -71dBm）
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> assoc-rssi 24
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 3：5G高频（assoc-rssi 24 = -71dBm）
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> assoc-rssi 24
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span></code></pre></div><h3 id="36-第六步特殊场景弱信号设备如iot唱吧">3.6 第六步：特殊场景——弱信号设备（如IoT唱吧）<a hidden class="anchor" aria-hidden="true" href="#36-第六步特殊场景弱信号设备如iot唱吧">#</a></h3>
+<p><strong>问题场景：</strong></p>
+<p>跨楼层覆盖时，设备信号本身较弱（比如1楼的唱吧，连接2楼的AP，信号-70dBm左右）。此时如果 assoc-rssi 默认值是24（-71dBm），唱吧刚好在踢出线上，反复被踢→重连→又被踢。</p>
+<p><strong>分析步骤：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 1. 先查看唱吧设备当前连接的AP和信号
+</span></span><span class="line"><span class="cl">show ac-config client by-ap-name
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 2. 查看这个AP的配置
+</span></span><span class="line"><span class="cl">show ap-config running &lt;AP名称&gt; | include rssi
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 3. 查到的数据：
+</span></span><span class="line"><span class="cl"># assoc-rssi 24 radio 2  ← 对应 -71dBm，踢出线太严格了
+</span></span><span class="line"><span class="cl"># response-rssi 15 radio 2 ← 对应 -80dBm
+</span></span></code></pre></div><p><strong>解决方案：降低 assoc-rssi，允许弱信号设备保持连接</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 针对唱吧所在AP（2F-Center）调整
+</span></span><span class="line"><span class="cl">ap-config 2F-Center
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Radio 2 和 Radio 3 都要改
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> assoc-rssi 15           # 从24降到15，允许信号-80dBm还在线
+</span></span><span class="line"><span class="cl"> response-rssi 15        # 保持不变
+</span></span><span class="line"><span class="cl"> power local 60          # 可选：适当提高功率增强信号
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> assoc-rssi 15
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> power local 60
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span></code></pre></div><blockquote>
+<p><strong>避坑提示</strong>：调 assoc-rssi 时，<strong>只改唱吧所在的AP</strong>，不要全局改，否则会降低其他区域的漫游质量。</p>
+</blockquote>
+<h3 id="37-第七步弱信号iot设备特殊处理">3.7 第七步：弱信号IoT设备特殊处理<a hidden class="anchor" aria-hidden="true" href="#37-第七步弱信号iot设备特殊处理">#</a></h3>
+<p>如果网内有IoT设备、唱吧等弱信号设备跨楼层连接某个AP，需要对该AP单独放宽 assoc-rssi 阈值，同时适当提高功率：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bashap-config &lt;IoT设备所在就近AP&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">radio 2
+</span></span><span class="line"><span class="cl"> assoc-rssi 15           # 降低踢出阈值
+</span></span><span class="line"><span class="cl"> response-rssi 15        # 保持
+</span></span><span class="line"><span class="cl"> power local 60          # 适当提高功率
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">radio 3
+</span></span><span class="line"><span class="cl"> assoc-rssi 15
+</span></span><span class="line"><span class="cl"> response-rssi 15
+</span></span><span class="line"><span class="cl"> power local 60
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span></code></pre></div><blockquote>
+<p><strong>避坑提示</strong>：设备不会自动切换AP，修改功率后需要让设备重新断开WiFi再重连才能关联到新AP。</p>
+</blockquote>
+<h3 id="38-第八步ap掉线问题排查ap103">3.8 第八步：AP掉线问题排查（AP103）<a hidden class="anchor" aria-hidden="true" href="#38-第八步ap掉线问题排查ap103">#</a></h3>
+<p><strong>问题描述：</strong></p>
+<p>AP103报错&quot;130 报文重传次数达到最大值&quot;，随后掉线。</p>
+<p><strong>分析原因：</strong></p>
+<p>错误码130通常是<strong>物理链路问题</strong>，不是AC配置问题。可能原因：</p>
+<ul>
+<li>网线损坏或水晶头松动</li>
+<li>PoE供电不稳定</li>
+<li>交换机端口故障</li>
+</ul>
+<p><strong>排查步骤：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Step 1: 检查AP指示灯
+</span></span><span class="line"><span class="cl">  - 绿色常亮：正常
+</span></span><span class="line"><span class="cl">  - 橙色闪烁：PoE供电异常
+</span></span><span class="line"><span class="cl">  - 灭灯：断电或网线断开
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Step 2: 重新插拔网线
+</span></span><span class="line"><span class="cl">  - 拔下AP端的网线，重新插紧
+</span></span><span class="line"><span class="cl">  - 检查水晶头是否氧化或损坏
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Step 3: 检查PoE供电
+</span></span><span class="line"><span class="cl">  - 确认PoE交换机/ injector是否正常
+</span></span><span class="line"><span class="cl">  - 测量电压是否在标准范围内（44-57V）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Step 4: 检查交换机端口
+</span></span><span class="line"><span class="cl">  - show interfaces GigabitEthernet 0/1
+</span></span><span class="line"><span class="cl">  - 查看是否有CRC错误、丢包等
+</span></span></code></pre></div><blockquote>
+<p><strong>避坑提示</strong>：遇到AP掉线先查物理层，90%的问题是网线/PoE，不要急着改AC配置。</p>
+</blockquote>
+<h3 id="39-第九步集中转发切换本地转发谨慎实施">3.9 第九步：集中转发切换本地转发（谨慎实施）<a hidden class="anchor" aria-hidden="true" href="#39-第九步集中转发切换本地转发谨慎实施">#</a></h3>
+<p><strong>当前模式问题：集中转发</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 查看当前转发模式
+</span></span><span class="line"><span class="cl">show wireless ap config global
+</span></span></code></pre></div><p>集中转发模式下，所有用户流量都通过CAPWAP隧道→AC→互联网：</p>
+<ul>
+<li>880个用户抢1Gbps的AC上行口</li>
+<li>AC成为性能瓶颈</li>
+<li>网速高峰期约1MB/s（约8Mbps）</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">集中转发模式流量路径：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  终端设备          AP              AC (WS6108)         互联网
+</span></span><span class="line"><span class="cl">    📱  ──无线──→  📡  ─CAPWAP─→  🖥️ [1Gbps口] ───→  🌐
+</span></span><span class="line"><span class="cl">    📱                            ⚠️ 瓶颈
+</span></span><span class="line"><span class="cl">    📱
+</span></span><span class="line"><span class="cl">    ... (880个终端)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">说明：所有用户流量都经过AC的1Gbps上行口转发
+</span></span></code></pre></div><p><strong>优化方案：切换本地转发</strong></p>
+<p>本地转发模式下，用户流量直接从接入交换机出去，AC只负责AP管理：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 切换单个AP到本地转发模式（测试用）
+</span></span><span class="line"><span class="cl">configure terminal
+</span></span><span class="line"><span class="cl">ap 1
+</span></span><span class="line"><span class="cl"> forwarding-mode local
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl"> write memory
+</span></span></code></pre></div><p><strong>本地转发配置步骤：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Step 1: 确认接入交换机放通VLAN 1101
+</span></span><span class="line"><span class="cl">         - 交换机端口配置 trunk allow vlan 1101
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Step 2: 在AC上为单个AP切换模式
+</span></span><span class="line"><span class="cl">         - 先选1台AP测试，成功后再批量
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Step 3: 验证功能
+</span></span><span class="line"><span class="cl">         - 终端能获取IP
+</span></span><span class="line"><span class="cl">         - 终端能上网
+</span></span><span class="line"><span class="cl">         - AC能看到AP在线
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Step 4: 批量切换其他AP
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Step 5: 如果出问题，回退
+</span></span><span class="line"><span class="cl">         - 改回 tunnel 模式即可恢复
+</span></span><span class="line"><span class="cl">本地转发模式流量路径：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  终端设备          AP         接入交换机        互联网
+</span></span><span class="line"><span class="cl">    📱  ──无线──→  📡  ────→  🔀  ──────────→  🌐
+</span></span><span class="line"><span class="cl">    📱              │          ↑
+</span></span><span class="line"><span class="cl">    📱              │          │
+</span></span><span class="line"><span class="cl">    ...             └─CAPWAP──┘
+</span></span><span class="line"><span class="cl">                    (仅管理流量)    AC (WS6108)
+</span></span><span class="line"><span class="cl">                                      🖥️
+</span></span><span class="line"><span class="cl">                                   (只管AP管理)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">说明：用户业务流量直接从接入交换机转发，AC只负责AP管理
+</span></span></code></pre></div><p><strong>本地转发后的预期效果：</strong></p>
+<ul>
+<li>网速从1MB/s提升到5-10MB/s</li>
+<li>峰值时段不再卡顿</li>
+<li>AC负载大幅降低</li>
+</ul>
+<h3 id="310-第十步配置文件导入注意事项">3.10 第十步：配置文件导入注意事项<a hidden class="anchor" aria-hidden="true" href="#310-第十步配置文件导入注意事项">#</a></h3>
+<p>当需要批量导入AP配置时，需要注意以下格式要求：</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">要求</th>
+          <th style="text-align: left">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">文件名</td>
+          <td style="text-align: left">必须是 <code>ap-config.text</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">编码</td>
+          <td style="text-align: left">GBK编码（不能用UTF-8）</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">换行符</td>
+          <td style="text-align: left">CRLF（Windows格式）</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">开头</td>
+          <td style="text-align: left">必须以 <code>!</code> 开头</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">结尾</td>
+          <td style="text-align: left">必须以 <code>end</code> 结尾</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>配置文件示例结构：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">!
+</span></span><span class="line"><span class="cl">! Configuration script
+</span></span><span class="line"><span class="cl">!
+</span></span><span class="line"><span class="cl">configure terminal
+</span></span><span class="line"><span class="cl"> ap 1
+</span></span><span class="line"><span class="cl">  radio 1
+</span></span><span class="line"><span class="cl">   channel 1
+</span></span><span class="line"><span class="cl">   channel-width 20MHz
+</span></span><span class="line"><span class="cl">   power local 30
+</span></span><span class="line"><span class="cl">   coverage-area-control 10
+</span></span><span class="line"><span class="cl">   sta-limit 15
+</span></span><span class="line"><span class="cl">   assoc-rssi 26
+</span></span><span class="line"><span class="cl">   response-rssi 15
+</span></span><span class="line"><span class="cl">   exit
+</span></span><span class="line"><span class="cl">  radio 2
+</span></span><span class="line"><span class="cl">   channel 36
+</span></span><span class="line"><span class="cl">   channel-width 20MHz
+</span></span><span class="line"><span class="cl">   power local 65
+</span></span><span class="line"><span class="cl">   coverage-area-control 15
+</span></span><span class="line"><span class="cl">   sta-limit 25
+</span></span><span class="line"><span class="cl">   assoc-rssi 24
+</span></span><span class="line"><span class="cl">   response-rssi 15
+</span></span><span class="line"><span class="cl">   exit
+</span></span><span class="line"><span class="cl">  exit
+</span></span><span class="line"><span class="cl"> exit
+</span></span><span class="line"><span class="cl">end
+</span></span></code></pre></div><blockquote>
+<p><strong>避坑提示</strong>：导入前务必确认编码格式！GBK编码错误会导致配置解析失败。</p>
+</blockquote>
+<hr>
+<h2 id="第四章验证与效果">第四章：验证与效果<a hidden class="anchor" aria-hidden="true" href="#第四章验证与效果">#</a></h2>
+<h3 id="41-配置验证命令">4.1 配置验证命令<a hidden class="anchor" aria-hidden="true" href="#41-配置验证命令">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# 查看AP运行配置
+</span></span><span class="line"><span class="cl">show ap running-config ap-name AP101
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看AP信号强度
+</span></span><span class="line"><span class="cl">show ap counter radio ap-name AP101
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看终端关联情况
+</span></span><span class="line"><span class="cl">show wireless station ap-name AP101
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看射频状态
+</span></span><span class="line"><span class="cl">show ap config running ap-name AP101
+</span></span></code></pre></div><h3 id="42-优化前后对比">4.2 优化前后对比<a hidden class="anchor" aria-hidden="true" href="#42-优化前后对比">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">指标</th>
+          <th style="text-align: left">优化前</th>
+          <th style="text-align: left">优化后</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">WiFi连接</td>
+          <td style="text-align: left">频繁断连/连不上</td>
+          <td style="text-align: left">稳定连接</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">网页打开速度</td>
+          <td style="text-align: left">10-30秒</td>
+          <td style="text-align: left">1-3秒</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">视频播放</td>
+          <td style="text-align: left">卡顿/缓冲</td>
+          <td style="text-align: left">流畅播放</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">高峰期网速</td>
+          <td style="text-align: left">约1MB/s</td>
+          <td style="text-align: left">约1MB/s（待切本地转发）</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">2.4G干扰</td>
+          <td style="text-align: left">严重</td>
+          <td style="text-align: left">基本消除</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">5G利用率</td>
+          <td style="text-align: left">低</td>
+          <td style="text-align: left">显著提升</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>说明</strong>：高峰期网速暂时还是约1MB/s，是因为还在用集中转发模式。切换到本地转发后，预计能提升到5-10MB/s。</p>
+</blockquote>
+<hr>
+<h2 id="第五章避坑指南总结">第五章：避坑指南总结<a hidden class="anchor" aria-hidden="true" href="#第五章避坑指南总结">#</a></h2>
+<h3 id="51-常见误区">5.1 常见误区<a hidden class="anchor" aria-hidden="true" href="#51-常见误区">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">误区</th>
+          <th style="text-align: left">真相</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">信道越多越好</td>
+          <td style="text-align: left">2.4G只认1/6/11，其他都是干扰</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">频宽越大越好</td>
+          <td style="text-align: left">密集环境20MHz比40MHz更稳定</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">功率越大覆盖越远越好</td>
+          <td style="text-align: left">功率过大会造成终端粘性，反而更卡</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">assoc-rssi 和 response-rssi 是一回事</td>
+          <td style="text-align: left">assoc-rssi 会踢已连用户，response-rssi 只管能否连进来</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">power local 是 dBm 值</td>
+          <td style="text-align: left">power local 是百分比（0-100），不是 dBm</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">coverage-area-control 越小越好</td>
+          <td style="text-align: left">它控制AP不回应弱信号设备，越大=覆盖越远</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">改完转发模式就好了</td>
+          <td style="text-align: left">tunnel local 优先级比全局开关还高！</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">AP掉线是AC的问题</td>
+          <td style="text-align: left">90%是网线/PoE/交换机端口问题，不是AC配置</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="52-实际操作注意事项">5.2 实际操作注意事项<a hidden class="anchor" aria-hidden="true" href="#52-实际操作注意事项">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">⚠️ 改配置前先 show running-config 备份
+</span></span><span class="line"><span class="cl">⚠️ 批量修改前先选一台AP测试
+</span></span><span class="line"><span class="cl">⚠️ 导入配置文件确认GBK编码
+</span></span><span class="line"><span class="cl">⚠️ 改完要 write memory 保存
+</span></span><span class="line"><span class="cl">⚠️ AP掉线先查物理层（网线/PoE）
+</span></span><span class="line"><span class="cl">⚠️ 弱信号拒绝要考虑终端兼容性
+</span></span><span class="line"><span class="cl">⚠️ assoc-rssi 改了会踢已连用户，response-rssi 不会
+</span></span><span class="line"><span class="cl">⚠️ 切转发模式前必查 tunnel local
+</span></span><span class="line"><span class="cl">⚠️ 切完转发模式WiFi不通，先查 WLAN 里的 tunnel local
+</span></span><span class="line"><span class="cl">⚠️ AP自动重连是正常行为，偶发掉线不用慌
+</span></span><span class="line"><span class="cl">⚠️ Radio 1=2.4G，Radio 2&amp;3=5G，命令格式是 ap-config 不是 ap
+</span></span></code></pre></div><h3 id="53-性能瓶颈排查路线图">5.3 性能瓶颈排查路线图<a hidden class="anchor" aria-hidden="true" href="#53-性能瓶颈排查路线图">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户报修
+</span></span><span class="line"><span class="cl">   ↓
+</span></span><span class="line"><span class="cl">是否连上WiFi？
+</span></span><span class="line"><span class="cl">   ├─ 否 → AP在线吗？
+</span></span><span class="line"><span class="cl">   │          ├─ 是 → DHCP正常吗？
+</span></span><span class="line"><span class="cl">   │          │          ├─ 是 → 是否被弱信号拒绝？
+</span></span><span class="line"><span class="cl">   │          │          │          ├─ 是 → 查 assoc-rssi / response-rssi
+</span></span><span class="line"><span class="cl">   │          │          │          └─ 否 → 查 AP射频是否开启
+</span></span><span class="line"><span class="cl">   │          │          └─ 否 → 查 VLAN/网关/DHCP
+</span></span><span class="line"><span class="cl">   │          └─ 否 → 查PoE/网线/交换机端口
+</span></span><span class="line"><span class="cl">   └─ 是 → 是否卡顿？
+</span></span><span class="line"><span class="cl">              ├─ 否 → 正常，结束
+</span></span><span class="line"><span class="cl">              └─ 是 → 2.4G干扰严重？
+</span></span><span class="line"><span class="cl">                         ├─ 是 → 引导用5G/调信道
+</span></span><span class="line"><span class="cl">                         └─ 否 → 功率过大终端粘性？
+</span></span><span class="line"><span class="cl">                                    ├─ 是 → 降低功率
+</span></span><span class="line"><span class="cl">                                    └─ 否 → AC上行口瓶颈？
+</span></span><span class="line"><span class="cl">                                               └─ 考虑本地转发（但要先查tunnel local）
+</span></span></code></pre></div><h3 id="54-命令速查表">5.4 命令速查表<a hidden class="anchor" aria-hidden="true" href="#54-命令速查表">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">目的</th>
+          <th style="text-align: left">命令</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">查看AP在线状态</td>
+          <td style="text-align: left"><code>show ap-config summary</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">查看AP配置</td>
+          <td style="text-align: left"><code>show ap-config running &lt;AP名&gt;</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">查看终端关联</td>
+          <td style="text-align: left"><code>show ac-config client summary</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">查看CAPWAP隧道</td>
+          <td style="text-align: left"><code>show capwap state</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">查看转发模式</td>
+          <td style="text-align: left">`show running-config</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">查看AP重启历史</td>
+          <td style="text-align: left"><code>show ap-config reboot history &lt;AP名&gt;</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">改单个AP配置</td>
+          <td style="text-align: left"><code>ap-config &lt;AP名&gt;</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">改WLAN配置</td>
+          <td style="text-align: left"><code>wlan-config &lt;ID&gt;</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">改全局转发模式</td>
+          <td style="text-align: left"><code>ac-controller</code> → <code>local-forwarding enable/no local-forwarding enable</code></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="附录完整配置模板">附录：完整配置模板<a hidden class="anchor" aria-hidden="true" href="#附录完整配置模板">#</a></h2>
+<p>以下是一台教室AP的完整配置模板，供参考：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash# ============================================
+</span></span><span class="line"><span class="cl"># RG-AP730-L 教室AP完整配置模板
+</span></span><span class="line"><span class="cl"># AP编号: XX
+</span></span><span class="line"><span class="cl"># 位置: XX楼XX教室
+</span></span><span class="line"><span class="cl"># Radio对应：1=2.4G，2=5G低频，3=5G高频
+</span></span><span class="line"><span class="cl"># ============================================
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ap-config AP101
+</span></span><span class="line"><span class="cl"> ap-mac 8005.XXXX.XXXX       # AP的MAC地址（产品贴纸上找）
+</span></span><span class="line"><span class="cl"> location 1F-Classroom-01      # 位置描述
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> # Radio 1: 2.4G
+</span></span><span class="line"><span class="cl"> radio 1
+</span></span><span class="line"><span class="cl">  radio-type 802.11gn
+</span></span><span class="line"><span class="cl">  channel 1
+</span></span><span class="line"><span class="cl">  channel-width 20MHz
+</span></span><span class="line"><span class="cl">  power local 30
+</span></span><span class="line"><span class="cl">  coverage-area-control 10
+</span></span><span class="line"><span class="cl">  sta-limit 15
+</span></span><span class="line"><span class="cl">  assoc-rssi 26
+</span></span><span class="line"><span class="cl">  response-rssi 15
+</span></span><span class="line"><span class="cl">  enable-radio 1
+</span></span><span class="line"><span class="cl">  exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> # Radio 2: 5G低频
+</span></span><span class="line"><span class="cl"> radio 2
+</span></span><span class="line"><span class="cl">  radio-type 802.11an
+</span></span><span class="line"><span class="cl">  channel 36
+</span></span><span class="line"><span class="cl">  channel-width 20MHz
+</span></span><span class="line"><span class="cl">  power local 65
+</span></span><span class="line"><span class="cl">  coverage-area-control 15
+</span></span><span class="line"><span class="cl">  sta-limit 25
+</span></span><span class="line"><span class="cl">  assoc-rssi 24
+</span></span><span class="line"><span class="cl">  response-rssi 15
+</span></span><span class="line"><span class="cl">  enable-radio 2
+</span></span><span class="line"><span class="cl">  exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> # Radio 3: 5G高频
+</span></span><span class="line"><span class="cl"> radio 3
+</span></span><span class="line"><span class="cl">  radio-type 802.11an
+</span></span><span class="line"><span class="cl">  channel 149
+</span></span><span class="line"><span class="cl">  channel-width 20MHz
+</span></span><span class="line"><span class="cl">  power local 65
+</span></span><span class="line"><span class="cl">  coverage-area-control 15
+</span></span><span class="line"><span class="cl">  sta-limit 25
+</span></span><span class="line"><span class="cl">  assoc-rssi 24
+</span></span><span class="line"><span class="cl">  response-rssi 15
+</span></span><span class="line"><span class="cl">  enable-radio 3
+</span></span><span class="line"><span class="cl">  exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># ============================================
+</span></span></code></pre></div><p><strong>走廊AP模板（关闭2.4G，减少干扰）：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bashap-config AP-Hallway-01
+</span></span><span class="line"><span class="cl"> ap-mac 8005.XXXX.XXXX
+</span></span><span class="line"><span class="cl"> location 1F-Hallway
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> radio 1
+</span></span><span class="line"><span class="cl">  no enable-radio 1           # 关闭2.4G
+</span></span><span class="line"><span class="cl">  exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> radio 2
+</span></span><span class="line"><span class="cl">  radio-type 802.11an
+</span></span><span class="line"><span class="cl">  channel 36
+</span></span><span class="line"><span class="cl">  channel-width 20MHz
+</span></span><span class="line"><span class="cl">  power local 40
+</span></span><span class="line"><span class="cl">  coverage-area-control 12
+</span></span><span class="line"><span class="cl">  sta-limit 25
+</span></span><span class="line"><span class="cl">  assoc-rssi 24
+</span></span><span class="line"><span class="cl">  response-rssi 15
+</span></span><span class="line"><span class="cl">  enable-radio 2
+</span></span><span class="line"><span class="cl">  exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> radio 3
+</span></span><span class="line"><span class="cl">  radio-type 802.11an
+</span></span><span class="line"><span class="cl">  channel 149
+</span></span><span class="line"><span class="cl">  channel-width 20MHz
+</span></span><span class="line"><span class="cl">  power local 40
+</span></span><span class="line"><span class="cl">  coverage-area-control 12
+</span></span><span class="line"><span class="cl">  sta-limit 25
+</span></span><span class="line"><span class="cl">  assoc-rssi 24
+</span></span><span class="line"><span class="cl">  response-rssi 15
+</span></span><span class="line"><span class="cl">  enable-radio 3
+</span></span><span class="line"><span class="cl">  exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">write memory
+</span></span></code></pre></div><hr>
+<h2 id="结语">结语<a hidden class="anchor" aria-hidden="true" href="#结语">#</a></h2>
+<p>WiFi优化不是一蹴而就的，是一个<strong>持续观察、调整、验证</strong>的过程。本文记录了这次校园WiFi优化的核心步骤，但实际环境中可能还会遇到其他问题。</p>
+<p>这次优化的过程也踩了不少坑——改了转发模式差点全校断网、弱信号设备反复被踢、AP掉线以为AC坏了结果只是PoE松了……<strong>每一次踩坑都是一次学习</strong>，关键是把经验记录下来。</p>
+<p><strong>建议的后续工作：</strong></p>
+<ol>
+<li>持续观察AP的终端关联数和流量</li>
+<li>用WiFi分析仪定期扫描信道使用情况</li>
+<li>收集用户反馈，持续微调参数</li>
+<li>如需切本地转发，提前确认交换机配置和审计要求</li>
+<li>定期导出配置备份：<code>show running-config</code></li>
+</ol>
+<p><strong>踩坑是成长的勋章，不是失败。</strong></p>
+<hr>
+<p><em>文档版本：v2.0</em>
+<em>更新时间：2026年5月</em>
+<em>适用设备：锐捷AC WS6108 + RG-AP730-L</em>
+<em>适用固件：RGOS 11.9(2)B1</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/%E6%97%A0%E7%BA%BF%E4%BC%98%E5%8C%96/">无线优化</a></li>
+      <li><a href="http://localhost:1313/tags/%E7%BD%91%E7%BB%9C/">网络</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">Wanzf&#39;s Blog</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

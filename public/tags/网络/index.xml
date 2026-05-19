@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>网络 on Wanzf&#39;s Blog</title>
+    <link>http://localhost:1313/tags/%E7%BD%91%E7%BB%9C/</link>
+    <description>Recent content in 网络 on Wanzf&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
+    <lastBuildDate>Tue, 19 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/%E7%BD%91%E7%BB%9C/index.xml" rel="self" type="application/rss" />
+    <item>
+      <title>校园WiFi优化实战指南</title>
+      <link>http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</link>
+      <pubDate>Tue, 19 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</guid>
+      <description>&lt;h1 id=&#34;校园wifi优化实战指南&#34;&gt;校园WiFi优化实战指南&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;从&amp;quot;全员吐槽&amp;quot;到&amp;quot;流畅上网&amp;quot;——一个真实校园WiFi改造项目的完整记录&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;写给谁看的？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;本文面向&lt;strong&gt;零基础网络管理员&lt;/strong&gt;，假设你：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;听说过WiFi，但不知道信道、频宽是什么&lt;/li&gt;
+&lt;li&gt;拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手&lt;/li&gt;
+&lt;li&gt;遇到用户抱怨&amp;quot;WiFi卡&amp;quot;，不知道从哪排查&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;本文不讲什么？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲&lt;strong&gt;实战中用得上的东西&lt;/strong&gt;——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;项目概况速览&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;项目&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;详情&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;场景&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;6层教学楼，60个教室 + 12个走廊&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;设备&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;锐捷AC WS6108 + 72台RG-AP730-L&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;用户数&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;880+ 终端同时连接&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;网络结构&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;管理VLAN 3997，用户VLAN 1101&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;优化前状态&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;连不上、卡顿、2.4G干扰严重&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;第一章先搞懂这些基本概念&#34;&gt;第一章：先搞懂这些基本概念&lt;/h2&gt;
+&lt;p&gt;动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道&amp;quot;血压&amp;quot;、&amp;ldquo;血糖&amp;quot;是什么指标一样。&lt;/p&gt;
+&lt;h3 id=&#34;11-ap和ac是什么&#34;&gt;1.1 AP和AC是什么？&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;AP（Access Point）&lt;/strong&gt;：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是&lt;strong&gt;发射无线信号，让手机/电脑能连上来&lt;/strong&gt;。通常安装在教室天花板中间位置。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;AC（Wireless Access Controller）&lt;/strong&gt;：无线控制器，可以理解为AP的&amp;quot;大脑&amp;rdquo;。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。&lt;/p&gt;
+&lt;h3 id=&#34;12-什么是信道&#34;&gt;1.2 什么是信道？&lt;/h3&gt;
+&lt;p&gt;你可以把信道理解为&lt;strong&gt;WiFi的&amp;quot;车道&amp;quot;&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。&lt;strong&gt;2.4G频段&lt;/strong&gt;的频率范围是2400MHz~2483MHz，把这段频率切成多个&amp;quot;车道&amp;quot;，每个&amp;quot;车道&amp;quot;就是一个信道。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.4G频段的关键知识：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;信道宽度约20MHz&lt;/li&gt;
+&lt;li&gt;相邻信道会重叠干扰（就像相邻车道会蹭到）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;只有1、6、11这三个信道是不重叠的&lt;/strong&gt;——这是铁律！&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2.4G信道分布示意：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;信道:  1    2    3    4    5    6    7    8    9   10   11
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      |====|====|====|====|====|====|====|====|====|====|====|
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      |_______________________|
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              信道 1 (中心频率 2412MHz)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                |_______________________|
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                        信道 6 (中心频率 2437MHz)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                          |_______________________|
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                  信道 11 (中心频率 2462MHz)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;5G频段&lt;/strong&gt;就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

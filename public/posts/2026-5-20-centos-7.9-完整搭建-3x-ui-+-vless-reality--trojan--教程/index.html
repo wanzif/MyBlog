@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>CentOS 7.9 搭建 3x-ui | Wanzf&#39;s Blog</title>
+<meta name="keywords" content="服务器">
+<meta name="description" content="CentOS 7.9 完整搭建 3x-ui &#43; VLESS Reality / Trojan  教程
+含所有踩坑记录和多客户端订阅方法
+================================================================================
+一、前置准备
+
+CentOS 7.9 云服务器（香港/海外节点）
+服务器公网 IP 和 root 密码
+SSH 工具（Windows: Xshell/Termius/PowerShell，Mac: 自带终端）
+
+连接：ssh root@你的服务器IP
+================================================================================
+二、系统更新 &#43; 关闭 SELinux
+⚠️ CentOS 默认开启 SELinux，会拦截面板和节点，必须先关！
+yum update -y &amp;&amp; yum install -y curl wget socat &amp;&amp; setenforce 0 &amp;&amp; sed -i &#39;s/SELINUX=enforcing/SELINUX=disabled/g&#39; /etc/selinux/config
+验证：
+getenforce
+# 输出 Disabled 或 Permissive 就对了
+================================================================================
+三、安装 3x-ui 面板
+bash &lt;(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+脚本提示是否自定义配置，输入 y，设置：
+
+用户名：别用 admin，自定义一个
+密码：设复杂的
+端口：20000 以上，如 21568
+
+不设置则默认：admin / admin / 2053">
+<meta name="author" content="Wanzf">
+<link rel="canonical" href="http://localhost:1313/posts/2026-5-20-centos-7.9-%E5%AE%8C%E6%95%B4%E6%90%AD%E5%BB%BA-3x-ui-&#43;-vless-reality--trojan--%E6%95%99%E7%A8%8B/">
+<link crossorigin="anonymous" href="http://localhost:1313/assets/css/stylesheet.89ca4972ab5e6aaa05e9a0dae0c4bb64b26585bc79e36f5cf33614eea0283abe.css" integrity="sha256-icpJcqteaqoF6aDa4MS7ZLJlhbx5429c8zYU7qAoOr4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-5-20-centos-7.9-%E5%AE%8C%E6%95%B4%E6%90%AD%E5%BB%BA-3x-ui-&#43;-vless-reality--trojan--%E6%95%99%E7%A8%8B/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="http://localhost:1313/posts/2026-5-20-centos-7.9-%E5%AE%8C%E6%95%B4%E6%90%AD%E5%BB%BA-3x-ui-&#43;-vless-reality--trojan--%E6%95%99%E7%A8%8B/">
+  <meta property="og:site_name" content="Wanzf&#39;s Blog">
+  <meta property="og:title" content="CentOS 7.9 搭建 3x-ui">
+  <meta property="og:description" content="CentOS 7.9 完整搭建 3x-ui &#43; VLESS Reality / Trojan 教程 含所有踩坑记录和多客户端订阅方法
+================================================================================
+一、前置准备
+CentOS 7.9 云服务器（香港/海外节点） 服务器公网 IP 和 root 密码 SSH 工具（Windows: Xshell/Termius/PowerShell，Mac: 自带终端） 连接：ssh root@你的服务器IP
+================================================================================
+二、系统更新 &#43; 关闭 SELinux
+⚠️ CentOS 默认开启 SELinux，会拦截面板和节点，必须先关！
+yum update -y &amp;&amp; yum install -y curl wget socat &amp;&amp; setenforce 0 &amp;&amp; sed -i &#39;s/SELINUX=enforcing/SELINUX=disabled/g&#39; /etc/selinux/config 验证：
+getenforce # 输出 Disabled 或 Permissive 就对了 ================================================================================
+三、安装 3x-ui 面板
+bash &lt;(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 脚本提示是否自定义配置，输入 y，设置：
+用户名：别用 admin，自定义一个 密码：设复杂的 端口：20000 以上，如 21568 不设置则默认：admin / admin / 2053">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-18T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-05-18T00:00:00+00:00">
+    <meta property="article:tag" content="服务器">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CentOS 7.9 搭建 3x-ui">
+  <meta name="twitter:description" content="CentOS 7.9 完整搭建 3x-ui &#43; VLESS Reality / Trojan 教程 含所有踩坑记录和多客户端订阅方法
+================================================================================
+一、前置准备
+CentOS 7.9 云服务器（香港/海外节点） 服务器公网 IP 和 root 密码 SSH 工具（Windows: Xshell/Termius/PowerShell，Mac: 自带终端） 连接：ssh root@你的服务器IP
+================================================================================
+二、系统更新 &#43; 关闭 SELinux
+⚠️ CentOS 默认开启 SELinux，会拦截面板和节点，必须先关！
+yum update -y &amp;&amp; yum install -y curl wget socat &amp;&amp; setenforce 0 &amp;&amp; sed -i &#39;s/SELINUX=enforcing/SELINUX=disabled/g&#39; /etc/selinux/config 验证：
+getenforce # 输出 Disabled 或 Permissive 就对了 ================================================================================
+三、安装 3x-ui 面板
+bash &lt;(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 脚本提示是否自定义配置，输入 y，设置：
+用户名：别用 admin，自定义一个 密码：设复杂的 端口：20000 以上，如 21568 不设置则默认：admin / admin / 2053">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "CentOS 7.9 搭建 3x-ui",
+      "item": "http://localhost:1313/posts/2026-5-20-centos-7.9-%E5%AE%8C%E6%95%B4%E6%90%AD%E5%BB%BA-3x-ui-+-vless-reality--trojan--%E6%95%99%E7%A8%8B/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "CentOS 7.9 搭建 3x-ui",
+  "name": "CentOS 7.9 搭建 3x-ui",
+  "description": "CentOS 7.9 完整搭建 3x-ui + VLESS Reality / Trojan 教程 含所有踩坑记录和多客户端订阅方法\n================================================================================\n一、前置准备\nCentOS 7.9 云服务器（香港/海外节点） 服务器公网 IP 和 root 密码 SSH 工具（Windows: Xshell/Termius/PowerShell，Mac: 自带终端） 连接：ssh root@你的服务器IP\n================================================================================\n二、系统更新 + 关闭 SELinux\n⚠️ CentOS 默认开启 SELinux，会拦截面板和节点，必须先关！\nyum update -y \u0026amp;\u0026amp; yum install -y curl wget socat \u0026amp;\u0026amp; setenforce 0 \u0026amp;\u0026amp; sed -i \u0026#39;s/SELINUX=enforcing/SELINUX=disabled/g\u0026#39; /etc/selinux/config 验证：\ngetenforce # 输出 Disabled 或 Permissive 就对了 ================================================================================\n三、安装 3x-ui 面板\nbash \u0026lt;(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 脚本提示是否自定义配置，输入 y，设置：\n用户名：别用 admin，自定义一个 密码：设复杂的 端口：20000 以上，如 21568 不设置则默认：admin / admin / 2053\n",
+  "keywords": [
+    "服务器"
+  ],
+  "articleBody": "CentOS 7.9 完整搭建 3x-ui + VLESS Reality / Trojan 教程 含所有踩坑记录和多客户端订阅方法\n================================================================================\n一、前置准备\nCentOS 7.9 云服务器（香港/海外节点） 服务器公网 IP 和 root 密码 SSH 工具（Windows: Xshell/Termius/PowerShell，Mac: 自带终端） 连接：ssh root@你的服务器IP\n================================================================================\n二、系统更新 + 关闭 SELinux\n⚠️ CentOS 默认开启 SELinux，会拦截面板和节点，必须先关！\nyum update -y \u0026\u0026 yum install -y curl wget socat \u0026\u0026 setenforce 0 \u0026\u0026 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config 验证：\ngetenforce # 输出 Disabled 或 Permissive 就对了 ================================================================================\n三、安装 3x-ui 面板\nbash \u003c(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) 脚本提示是否自定义配置，输入 y，设置：\n用户名：别用 admin，自定义一个 密码：设复杂的 端口：20000 以上，如 21568 不设置则默认：admin / admin / 2053\n忘记设置？SSH 里查看：\nx-ui # 选 10 查看当前设置 ================================================================================\n四、升级内核 + 开启 BBR\n⚠️ CentOS 7.9 默认内核 3.10 不支持 BBR！手动装 ELRepo 经常失败（仓库源装不上），必须用一键脚本。\nwget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh chmod +x bbr.sh \u0026\u0026 ./bbr.sh 提示重启输入 y，重启后验证：\nuname -r # 应显示 5.x+ sysctl net.ipv4.tcp_congestion_control # 应输出 bbr BBR 暂时搞不定不影响代理使用，只是速度稍慢。\n================================================================================\n五、防火墙放行端口\n⚠️ CentOS 用 firewalld，不是 ufw！别用 ufw 命令！\nfirewall-cmd --permanent --add-port=21568/tcp # 面板端口 firewall-cmd --permanent --add-port=443/tcp # 节点端口 firewall-cmd --permanent --add-port=443/udp firewall-cmd --permanent --add-port=80/tcp # 证书申请 firewall-cmd --permanent --add-port=2096/tcp # 订阅端口 firewall-cmd --reload ⚠️ 阿里云/腾讯云/AWS 还要去网页控制台安全组放行这些端口！\n================================================================================\n六、面板基础配置\n浏览器访问 http://IP:端口，登录后：\n语言改成中文 修改默认密码 ================================================================================\n七、添加 VLESS Reality 节点\n入站列表 → 添加入站\n基础配置：\n备注：随便写 协议：vless 端口：443 其他保持默认 Stream 设置：\nTransmission：tcp Security：reality Reality 设置：\n点 X25519 生成密钥对 uTLS Target / SNI：默认 www.amazon.com:443 就行 其他全部默认 客户栏：\nflow：选 xtls-rprx-vision-udp443（支持 UDP 443，功能更全） ID（UUID）：自动生成，客户端要填的 Sniffing：开启，勾选 HTTP + TLS + QUIC + FAKEDNS\n其他字段全部默认，不用动。\nVLESS Reality 字段说明 基础配置：\n字段 含义 启用 开关 备注 节点名字 部署到 多服务器时选，单台不管 地址 监听地址，留空=监听所有 总流量 0.0 不限流量 到期时间 空=永不过期 客户栏：\n字段 含义 Email 用户标识，随机生成的就行 ID (UUID) 核心凭证，客户端连接必须填 Reverse tag 反向代理，不用管 Subscription 订阅标签，不用管 Comment 备注，不用管 Total traffic 流量限制，0=不限 Expiry 过期时间 Decryption none，VLESS 标准 Encryption none，VLESS 标准 Reality 设置：\n字段 含义 Show 调试信息，不用开 Xver PROXY protocol 版本，保持 0 uTLS Target 伪装目标网站，默认即可 SNI 伪装域名，跟 Target 一致 Max Time Diff 时间差限制，0=不限 Short IDs 客户端需匹配其中一个，自动生成 公钥 客户端配置要填 私钥 ⚠️ 只留服务器，绝不能泄露！ mldsa65 Seed/Verify 后量子密钥，不用管 flow 选择：\nxtls-rprx-vision：标准模式，处理 TCP xtls-rprx-vision-udp443：额外支持 UDP 443（HTTP/3/QUIC），推荐选这个 Sniffing 设置：\nEnabled：开启 HTTP + TLS + QUIC + FAKEDNS：全部勾选 其他不勾 ================================================================================\n八、添加 Trojan 节点（Clash 客户端推荐）\n⚠️ VLESS Reality 和 Trojan 可以同时添加，但端口不能重复！比如 VLESS 用 443，Trojan 用 8443。\n入站列表 → 添加入站\n基础配置：\n协议：trojan 端口：8443（避开已占用的 443） 其他默认 Stream 设置：\nTransmission：tcp Security：tls TLS 设置（无域名，IP 自签证书）：\n字段 怎么填 SNI 留空（没域名不填） uTLS chrome ALPN 留空或 http/1.1 Reject Unknown SNI 不开（没域名会拦自己） 其他 默认 数字证书：先保存节点，然后 SSH 申请 IP 证书：\nx-ui 选 18（SSL Certificate Management）→ 选 2（Let’s Encrypt for IP Address）\n申请完后回到节点编辑页面，证书路径会自动填入。\n然后放行 Trojan 端口：\nfirewall-cmd --permanent --add-port=8443/tcp \u0026\u0026 firewall-cmd --reload ⚠️ 云安全组也要放行 8443！\n================================================================================\n九、订阅设置（最关键的坑！）\n⚠️ 这是最大的坑！3x-ui 有两套订阅端点，给不同客户端用的！\n面板设置 → 订阅设置：\n必须同时开启两个：\n选项 作用 URI 路径 常规（JSON subscription） v2ray 客户端订阅 /sub/ Clash / Mihomo subscription Clash 客户端订阅 /clash/ 两个都要开启！保存后重启面板：\nx-ui restart 两套订阅链接的区别 假设你的订阅 TOKEN 是 abc123：\n客户端 订阅链接 说明 v2rayN / v2rayNG http://IP:2096/sub/abc123 /sub/ 路径 Clash Verge http://IP:2096/clash/abc123 /clash/ 路径 ⚠️ 路径不同！/sub/ 给 v2ray 用，/clash/ 给 Clash 用，不能混用！\n⚠️ /clash/ 路径不能改成跟 /sub/ 一样，否则格式冲突！\n获取订阅链接：入站列表 → 点节点⋮ → 操作 → 复制订阅链接\n================================================================================\n十、客户端配置\n10.1 v2rayN（Windows） 复制 /sub/ 订阅链接 v2rayN → 订阅 → 订阅设置 → 添加 → 粘贴链接 订阅 → 更新全部订阅 选中节点 → 设为活动服务器 → 开启系统代理 10.2 v2rayNG（Android） 复制 /sub/ 订阅链接 打开 v2rayNG → 右下角 + → 从剪贴板导入 选中节点 → 连接 10.3 NekoBox（iOS/Mac） 复制 /sub/ 订阅链接 添加 → 从剪贴板导入 选中节点 → 连接 10.4 Clash Verge Rev（Windows/Mac/Linux） ⚠️ 必须用 /clash/ 订阅链接！用 /sub/ 的导入会失败！\n复制 /clash/ 订阅链接 Clash Verge → 配置 → 新建 → Remote → 粘贴链接 保存 → 选中配置 → 开启系统代理 如果 /clash/ 订阅导入还是失败，手动创建 Local 配置：\nClash Verge → 配置 → 新建 → Local → 编辑\nVLESS Reality 节点模板：\nmixed-port: 7890 allow-lan: false mode: rule log-level: info dns: enable: true enhanced-mode: fake-ip nameserver: - 223.5.5.5 - 119.29.29.29 fallback: - 8.8.8.8 - 1.1.1.1 proxies: - name: \"vless-reality\" type: vless server: 你的服务器IP port: 443 uuid: 你的UUID network: tcp tls: true udp: true flow: xtls-rprx-vision-udp443 servername: www.amazon.com reality-opts: public-key: 你的公钥 short-id: 你的short-id client-fingerprint: chrome proxy-groups: - name: \"🚀 节点选择\" type: select proxies: - vless-reality - DIRECT rules: - GEOIP,CN,DIRECT - MATCH,🚀 节点选择 Trojan 节点模板：\nmixed-port: 7890 allow-lan: false mode: rule log-level: info dns: enable: true enhanced-mode: fake-ip nameserver: - 223.5.5.5 - 119.29.29.29 fallback: - 8.8.8.8 - 1.1.1.1 proxies: - name: \"trojan\" type: trojan server: 你的服务器IP port: 8443 password: 你的Password udp: true sni: 你的服务器IP skip-cert-verify: true client-fingerprint: chrome proxy-groups: - name: \"🚀 节点选择\" type: select proxies: - trojan - DIRECT rules: - GEOIP,CN,DIRECT - MATCH,🚀 节点选择 ⚠️ Trojan 模板中 skip-cert-verify 必须为 true（IP 自签证书验证会失败）\n10.5 Linux 客户端 安装 xray：\nbash \u003c(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh) install 配置文件 /usr/local/etc/xray/config.json：\n{ \"inbounds\": [ {\"port\": 10808, \"listen\": \"127.0.0.1\", \"protocol\": \"socks\", \"settings\": {\"udp\": true}}, {\"port\": 10809, \"listen\": \"127.0.0.1\", \"protocol\": \"http\"} ], \"outbounds\": [ { \"protocol\": \"vless\", \"settings\": { \"vnext\": [{\"address\": \"你的服务器IP\", \"port\": 443, \"users\": [{\"id\": \"你的UUID\", \"encryption\": \"none\", \"flow\": \"xtls-rprx-vision-udp443\"}]}] }, \"streamSettings\": { \"network\": \"tcp\", \"security\": \"reality\", \"realitySettings\": { \"serverName\": \"www.amazon.com\", \"publicKey\": \"你的公钥\", \"shortId\": \"你的short-id\", \"fingerprint\": \"chrome\" } } } ] } 启动：\nsystemctl start xray \u0026\u0026 systemctl enable xray 使用代理：\nexport https_proxy=http://127.0.0.1:10809 export http_proxy=http://127.0.0.1:10809 export all_proxy=socks5://127.0.0.1:10808 ================================================================================\n十一、批量一键部署（多台服务器）\n保存为 deploy.sh：\n#!/bin/bash PORT=${1:-2053} USER=${2:-admin} PASS=${3:-admin} yum update -y \u0026\u0026 yum install -y curl wget socat setenforce 0 2\u003e/dev/null sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config bash \u003c(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) \u003c",
+  "wordCount" : "1031",
+  "inLanguage": "zh",
+  "datePublished": "2026-05-18T00:00:00Z",
+  "dateModified": "2026-05-18T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Wanzf"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/2026-5-20-centos-7.9-%E5%AE%8C%E6%95%B4%E6%90%AD%E5%BB%BA-3x-ui-+-vless-reality--trojan--%E6%95%99%E7%A8%8B/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Wanzf's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Wanzf&#39;s Blog (Alt + H)">Wanzf&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/" title="分类">
+                    <span>分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/about/" title="关于">
+                    <span>关于</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      CentOS 7.9 搭建 3x-ui
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-05-18 00:00:00 +0000 UTC'>2026年5月18日</span>&nbsp;·&nbsp;<span>5 分钟</span>&nbsp;·&nbsp;<span>Wanzf</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/wanzif/MyBlog/tree/main/content/posts/2026-5-20-CentOS%207.9%20%e5%ae%8c%e6%95%b4%e6%90%ad%e5%bb%ba%203x-ui%20&#43;%20VLESS%20Reality%20%20Trojan%20%20%e6%95%99%e7%a8%8b.md" rel="noopener noreferrer edit" target="_blank">编辑此页</a>
+    </span>
+
+</div>
+  </header> <details class="toc"  open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">目录</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#vless-reality-%e5%ad%97%e6%ae%b5%e8%af%b4%e6%98%8e" aria-label="VLESS Reality 字段说明">VLESS Reality 字段说明</a></li>
+            <li>
+                <a href="#%e4%b8%a4%e5%a5%97%e8%ae%a2%e9%98%85%e9%93%be%e6%8e%a5%e7%9a%84%e5%8c%ba%e5%88%ab" aria-label="两套订阅链接的区别">两套订阅链接的区别</a></li>
+            <li>
+                <a href="#101-v2raynwindows" aria-label="10.1 v2rayN（Windows）">10.1 v2rayN（Windows）</a></li>
+            <li>
+                <a href="#102-v2rayngandroid" aria-label="10.2 v2rayNG（Android）">10.2 v2rayNG（Android）</a></li>
+            <li>
+                <a href="#103-nekoboxiosmac" aria-label="10.3 NekoBox（iOS/Mac）">10.3 NekoBox（iOS/Mac）</a></li>
+            <li>
+                <a href="#104-clash-verge-revwindowsmaclinux" aria-label="10.4 Clash Verge Rev（Windows/Mac/Linux）">10.4 Clash Verge Rev（Windows/Mac/Linux）</a></li>
+            <li>
+                <a href="#105-linux-%e5%ae%a2%e6%88%b7%e7%ab%af" aria-label="10.5 Linux 客户端">10.5 Linux 客户端</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p>CentOS 7.9 完整搭建 3x-ui + VLESS Reality / Trojan  教程
+含所有踩坑记录和多客户端订阅方法</p>
+<p>================================================================================</p>
+<p>一、前置准备</p>
+<ul>
+<li>CentOS 7.9 云服务器（香港/海外节点）</li>
+<li>服务器公网 IP 和 root 密码</li>
+<li>SSH 工具（Windows: Xshell/Termius/PowerShell，Mac: 自带终端）</li>
+</ul>
+<p>连接：ssh root@你的服务器IP</p>
+<p>================================================================================</p>
+<p>二、系统更新 + 关闭 SELinux</p>
+<p>⚠️ CentOS 默认开启 SELinux，会拦截面板和节点，必须先关！</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">yum update -y <span class="o">&amp;&amp;</span> yum install -y curl wget socat <span class="o">&amp;&amp;</span> setenforce <span class="m">0</span> <span class="o">&amp;&amp;</span> sed -i <span class="s1">&#39;s/SELINUX=enforcing/SELINUX=disabled/g&#39;</span> /etc/selinux/config
+</span></span></code></pre></div><p>验证：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">getenforce
+</span></span><span class="line"><span class="cl"><span class="c1"># 输出 Disabled 或 Permissive 就对了</span>
+</span></span></code></pre></div><p>================================================================================</p>
+<p>三、安装 3x-ui 面板</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">bash &lt;<span class="o">(</span>curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh<span class="o">)</span>
+</span></span></code></pre></div><p>脚本提示是否自定义配置，输入 y，设置：</p>
+<ul>
+<li>用户名：别用 admin，自定义一个</li>
+<li>密码：设复杂的</li>
+<li>端口：20000 以上，如 21568</li>
+</ul>
+<p>不设置则默认：admin / admin / 2053</p>
+<p>忘记设置？SSH 里查看：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">x-ui    <span class="c1"># 选 10 查看当前设置</span>
+</span></span></code></pre></div><p>================================================================================</p>
+<p>四、升级内核 + 开启 BBR</p>
+<p>⚠️ CentOS 7.9 默认内核 3.10 不支持 BBR！手动装 ELRepo 经常失败（仓库源装不上），必须用一键脚本。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
+</span></span><span class="line"><span class="cl">chmod +x bbr.sh <span class="o">&amp;&amp;</span> ./bbr.sh
+</span></span></code></pre></div><p>提示重启输入 y，重启后验证：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">uname -r                              <span class="c1"># 应显示 5.x+</span>
+</span></span><span class="line"><span class="cl">sysctl net.ipv4.tcp_congestion_control <span class="c1"># 应输出 bbr</span>
+</span></span></code></pre></div><p>BBR 暂时搞不定不影响代理使用，只是速度稍慢。</p>
+<p>================================================================================</p>
+<p>五、防火墙放行端口</p>
+<p>⚠️ CentOS 用 firewalld，不是 ufw！别用 ufw 命令！</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>21568/tcp   <span class="c1"># 面板端口</span>
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>443/tcp      <span class="c1"># 节点端口</span>
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>443/udp
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>80/tcp       <span class="c1"># 证书申请</span>
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>2096/tcp     <span class="c1"># 订阅端口</span>
+</span></span><span class="line"><span class="cl">firewall-cmd --reload
+</span></span></code></pre></div><p>⚠️ 阿里云/腾讯云/AWS 还要去网页控制台安全组放行这些端口！</p>
+<p>================================================================================</p>
+<p>六、面板基础配置</p>
+<p>浏览器访问 http://IP:端口，登录后：</p>
+<ol>
+<li>语言改成中文</li>
+<li>修改默认密码</li>
+</ol>
+<p>================================================================================</p>
+<p>七、添加 VLESS Reality 节点</p>
+<p>入站列表 → 添加入站</p>
+<p>基础配置：</p>
+<ul>
+<li>备注：随便写</li>
+<li>协议：vless</li>
+<li>端口：443</li>
+<li>其他保持默认</li>
+</ul>
+<p>Stream 设置：</p>
+<ul>
+<li>Transmission：tcp</li>
+<li>Security：reality</li>
+</ul>
+<p>Reality 设置：</p>
+<ul>
+<li>点 X25519 生成密钥对</li>
+<li>uTLS Target / SNI：默认 <a href="https://www.amazon.com">www.amazon.com</a>:443 就行</li>
+<li>其他全部默认</li>
+</ul>
+<p>客户栏：</p>
+<ul>
+<li>flow：选 xtls-rprx-vision-udp443（支持 UDP 443，功能更全）</li>
+<li>ID（UUID）：自动生成，客户端要填的</li>
+</ul>
+<p>Sniffing：开启，勾选 HTTP + TLS + QUIC + FAKEDNS</p>
+<p>其他字段全部默认，不用动。</p>
+<h3 id="vless-reality-字段说明">VLESS Reality 字段说明<a hidden class="anchor" aria-hidden="true" href="#vless-reality-字段说明">#</a></h3>
+<p><strong>基础配置：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>启用</td>
+          <td>开关</td>
+      </tr>
+      <tr>
+          <td>备注</td>
+          <td>节点名字</td>
+      </tr>
+      <tr>
+          <td>部署到</td>
+          <td>多服务器时选，单台不管</td>
+      </tr>
+      <tr>
+          <td>地址</td>
+          <td>监听地址，留空=监听所有</td>
+      </tr>
+      <tr>
+          <td>总流量 0.0</td>
+          <td>不限流量</td>
+      </tr>
+      <tr>
+          <td>到期时间</td>
+          <td>空=永不过期</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>客户栏：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Email</td>
+          <td>用户标识，随机生成的就行</td>
+      </tr>
+      <tr>
+          <td>ID (UUID)</td>
+          <td>核心凭证，客户端连接必须填</td>
+      </tr>
+      <tr>
+          <td>Reverse tag</td>
+          <td>反向代理，不用管</td>
+      </tr>
+      <tr>
+          <td>Subscription</td>
+          <td>订阅标签，不用管</td>
+      </tr>
+      <tr>
+          <td>Comment</td>
+          <td>备注，不用管</td>
+      </tr>
+      <tr>
+          <td>Total traffic</td>
+          <td>流量限制，0=不限</td>
+      </tr>
+      <tr>
+          <td>Expiry</td>
+          <td>过期时间</td>
+      </tr>
+      <tr>
+          <td>Decryption</td>
+          <td>none，VLESS 标准</td>
+      </tr>
+      <tr>
+          <td>Encryption</td>
+          <td>none，VLESS 标准</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Reality 设置：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Show</td>
+          <td>调试信息，不用开</td>
+      </tr>
+      <tr>
+          <td>Xver</td>
+          <td>PROXY protocol 版本，保持 0</td>
+      </tr>
+      <tr>
+          <td>uTLS Target</td>
+          <td>伪装目标网站，默认即可</td>
+      </tr>
+      <tr>
+          <td>SNI</td>
+          <td>伪装域名，跟 Target 一致</td>
+      </tr>
+      <tr>
+          <td>Max Time Diff</td>
+          <td>时间差限制，0=不限</td>
+      </tr>
+      <tr>
+          <td>Short IDs</td>
+          <td>客户端需匹配其中一个，自动生成</td>
+      </tr>
+      <tr>
+          <td>公钥</td>
+          <td>客户端配置要填</td>
+      </tr>
+      <tr>
+          <td>私钥</td>
+          <td>⚠️ 只留服务器，绝不能泄露！</td>
+      </tr>
+      <tr>
+          <td>mldsa65 Seed/Verify</td>
+          <td>后量子密钥，不用管</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>flow 选择：</strong></p>
+<ul>
+<li>xtls-rprx-vision：标准模式，处理 TCP</li>
+<li>xtls-rprx-vision-udp443：额外支持 UDP 443（HTTP/3/QUIC），推荐选这个</li>
+</ul>
+<p><strong>Sniffing 设置：</strong></p>
+<ul>
+<li>Enabled：开启</li>
+<li>HTTP + TLS + QUIC + FAKEDNS：全部勾选</li>
+<li>其他不勾</li>
+</ul>
+<p>================================================================================</p>
+<p>八、添加 Trojan 节点（Clash 客户端推荐）</p>
+<p>⚠️ VLESS Reality 和 Trojan 可以同时添加，但端口不能重复！比如 VLESS 用 443，Trojan 用 8443。</p>
+<p>入站列表 → 添加入站</p>
+<p>基础配置：</p>
+<ul>
+<li>协议：trojan</li>
+<li>端口：8443（避开已占用的 443）</li>
+<li>其他默认</li>
+</ul>
+<p>Stream 设置：</p>
+<ul>
+<li>Transmission：tcp</li>
+<li>Security：tls</li>
+</ul>
+<p>TLS 设置（无域名，IP 自签证书）：</p>
+<table>
+  <thead>
+      <tr>
+          <th>字段</th>
+          <th>怎么填</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>SNI</td>
+          <td>留空（没域名不填）</td>
+      </tr>
+      <tr>
+          <td>uTLS</td>
+          <td>chrome</td>
+      </tr>
+      <tr>
+          <td>ALPN</td>
+          <td>留空或 http/1.1</td>
+      </tr>
+      <tr>
+          <td>Reject Unknown SNI</td>
+          <td>不开（没域名会拦自己）</td>
+      </tr>
+      <tr>
+          <td>其他</td>
+          <td>默认</td>
+      </tr>
+  </tbody>
+</table>
+<p>数字证书：先保存节点，然后 SSH 申请 IP 证书：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">x-ui
+</span></span></code></pre></div><p>选 18（SSL Certificate Management）→ 选 2（Let&rsquo;s Encrypt for IP Address）</p>
+<p>申请完后回到节点编辑页面，证书路径会自动填入。</p>
+<p>然后放行 Trojan 端口：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>8443/tcp <span class="o">&amp;&amp;</span> firewall-cmd --reload
+</span></span></code></pre></div><p>⚠️ 云安全组也要放行 8443！</p>
+<p>================================================================================</p>
+<p>九、订阅设置（最关键的坑！）</p>
+<p>⚠️ 这是最大的坑！3x-ui 有两套订阅端点，给不同客户端用的！</p>
+<p>面板设置 → 订阅设置：</p>
+<p><strong>必须同时开启两个：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>选项</th>
+          <th>作用</th>
+          <th>URI 路径</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>常规（JSON subscription）</td>
+          <td>v2ray 客户端订阅</td>
+          <td>/sub/</td>
+      </tr>
+      <tr>
+          <td>Clash / Mihomo subscription</td>
+          <td>Clash 客户端订阅</td>
+          <td>/clash/</td>
+      </tr>
+  </tbody>
+</table>
+<p>两个都要开启！保存后重启面板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">x-ui restart
+</span></span></code></pre></div><h3 id="两套订阅链接的区别">两套订阅链接的区别<a hidden class="anchor" aria-hidden="true" href="#两套订阅链接的区别">#</a></h3>
+<p>假设你的订阅 TOKEN 是 abc123：</p>
+<table>
+  <thead>
+      <tr>
+          <th>客户端</th>
+          <th>订阅链接</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>v2rayN / v2rayNG</td>
+          <td>http://IP:2096/sub/abc123</td>
+          <td>/sub/ 路径</td>
+      </tr>
+      <tr>
+          <td>Clash Verge</td>
+          <td>http://IP:2096/clash/abc123</td>
+          <td>/clash/ 路径</td>
+      </tr>
+  </tbody>
+</table>
+<p>⚠️ <strong>路径不同！/sub/ 给 v2ray 用，/clash/ 给 Clash 用，不能混用！</strong></p>
+<p>⚠️ <strong>/clash/ 路径不能改成跟 /sub/ 一样，否则格式冲突！</strong></p>
+<p>获取订阅链接：入站列表 → 点节点⋮ → 操作 → 复制订阅链接</p>
+<p>================================================================================</p>
+<p>十、客户端配置</p>
+<h3 id="101-v2raynwindows">10.1 v2rayN（Windows）<a hidden class="anchor" aria-hidden="true" href="#101-v2raynwindows">#</a></h3>
+<ol>
+<li>复制 /sub/ 订阅链接</li>
+<li>v2rayN → 订阅 → 订阅设置 → 添加 → 粘贴链接</li>
+<li>订阅 → 更新全部订阅</li>
+<li>选中节点 → 设为活动服务器 → 开启系统代理</li>
+</ol>
+<h3 id="102-v2rayngandroid">10.2 v2rayNG（Android）<a hidden class="anchor" aria-hidden="true" href="#102-v2rayngandroid">#</a></h3>
+<ol>
+<li>复制 /sub/ 订阅链接</li>
+<li>打开 v2rayNG → 右下角 + → 从剪贴板导入</li>
+<li>选中节点 → 连接</li>
+</ol>
+<h3 id="103-nekoboxiosmac">10.3 NekoBox（iOS/Mac）<a hidden class="anchor" aria-hidden="true" href="#103-nekoboxiosmac">#</a></h3>
+<ol>
+<li>复制 /sub/ 订阅链接</li>
+<li>添加 → 从剪贴板导入</li>
+<li>选中节点 → 连接</li>
+</ol>
+<h3 id="104-clash-verge-revwindowsmaclinux">10.4 Clash Verge Rev（Windows/Mac/Linux）<a hidden class="anchor" aria-hidden="true" href="#104-clash-verge-revwindowsmaclinux">#</a></h3>
+<p>⚠️ 必须用 /clash/ 订阅链接！用 /sub/ 的导入会失败！</p>
+<ol>
+<li>复制 /clash/ 订阅链接</li>
+<li>Clash Verge → 配置 → 新建 → Remote → 粘贴链接</li>
+<li>保存 → 选中配置 → 开启系统代理</li>
+</ol>
+<p>如果 /clash/ 订阅导入还是失败，手动创建 Local 配置：</p>
+<p>Clash Verge → 配置 → 新建 → Local → 编辑</p>
+<p>VLESS Reality 节点模板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">mixed-port</span><span class="p">:</span><span class="w"> </span><span class="m">7890</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">allow-lan</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l">rule</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">log-level</span><span class="p">:</span><span class="w"> </span><span class="l">info</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">dns</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enable</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enhanced-mode</span><span class="p">:</span><span class="w"> </span><span class="l">fake-ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">nameserver</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">223.5.5.5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">119.29.29.29</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">fallback</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">8.8.8.8</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">1.1.1.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">proxies</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;vless-reality&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">vless</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="l">你的服务器IP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">uuid</span><span class="p">:</span><span class="w"> </span><span class="l">你的UUID</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">network</span><span class="p">:</span><span class="w"> </span><span class="l">tcp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">tls</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">udp</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">flow</span><span class="p">:</span><span class="w"> </span><span class="l">xtls-rprx-vision-udp443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">servername</span><span class="p">:</span><span class="w"> </span><span class="l">www.amazon.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">reality-opts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">public-key</span><span class="p">:</span><span class="w"> </span><span class="l">你的公钥</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">short-id</span><span class="p">:</span><span class="w"> </span><span class="l">你的short-id</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">client-fingerprint</span><span class="p">:</span><span class="w"> </span><span class="l">chrome</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">proxy-groups</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;🚀 节点选择&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">select</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">proxies</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">vless-reality</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">DIRECT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">GEOIP,CN,DIRECT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">MATCH,🚀 节点选择</span><span class="w">
+</span></span></span></code></pre></div><p>Trojan 节点模板：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">mixed-port</span><span class="p">:</span><span class="w"> </span><span class="m">7890</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">allow-lan</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l">rule</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">log-level</span><span class="p">:</span><span class="w"> </span><span class="l">info</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">dns</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enable</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">enhanced-mode</span><span class="p">:</span><span class="w"> </span><span class="l">fake-ip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">nameserver</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">223.5.5.5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">119.29.29.29</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">fallback</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">8.8.8.8</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">1.1.1.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">proxies</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;trojan&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">trojan</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="l">你的服务器IP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l">你的Password</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">udp</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">sni</span><span class="p">:</span><span class="w"> </span><span class="l">你的服务器IP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">skip-cert-verify</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">client-fingerprint</span><span class="p">:</span><span class="w"> </span><span class="l">chrome</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">proxy-groups</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;🚀 节点选择&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">select</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">proxies</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">trojan</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">DIRECT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">GEOIP,CN,DIRECT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">MATCH,🚀 节点选择</span><span class="w">
+</span></span></span></code></pre></div><p>⚠️ Trojan 模板中 skip-cert-verify 必须为 true（IP 自签证书验证会失败）</p>
+<h3 id="105-linux-客户端">10.5 Linux 客户端<a hidden class="anchor" aria-hidden="true" href="#105-linux-客户端">#</a></h3>
+<p>安装 xray：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">bash &lt;<span class="o">(</span>curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh<span class="o">)</span> install
+</span></span></code></pre></div><p>配置文件 /usr/local/etc/xray/config.json：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;inbounds&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">10808</span><span class="p">,</span> <span class="nt">&#34;listen&#34;</span><span class="p">:</span> <span class="s2">&#34;127.0.0.1&#34;</span><span class="p">,</span> <span class="nt">&#34;protocol&#34;</span><span class="p">:</span> <span class="s2">&#34;socks&#34;</span><span class="p">,</span> <span class="nt">&#34;settings&#34;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&#34;udp&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">}},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">10809</span><span class="p">,</span> <span class="nt">&#34;listen&#34;</span><span class="p">:</span> <span class="s2">&#34;127.0.0.1&#34;</span><span class="p">,</span> <span class="nt">&#34;protocol&#34;</span><span class="p">:</span> <span class="s2">&#34;http&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;outbounds&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;protocol&#34;</span><span class="p">:</span> <span class="s2">&#34;vless&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;settings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;vnext&#34;</span><span class="p">:</span> <span class="p">[{</span><span class="nt">&#34;address&#34;</span><span class="p">:</span> <span class="s2">&#34;你的服务器IP&#34;</span><span class="p">,</span> <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">443</span><span class="p">,</span> <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[{</span><span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="s2">&#34;你的UUID&#34;</span><span class="p">,</span> <span class="nt">&#34;encryption&#34;</span><span class="p">:</span> <span class="s2">&#34;none&#34;</span><span class="p">,</span> <span class="nt">&#34;flow&#34;</span><span class="p">:</span> <span class="s2">&#34;xtls-rprx-vision-udp443&#34;</span><span class="p">}]}]</span>
+</span></span><span class="line"><span class="cl">      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;streamSettings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;network&#34;</span><span class="p">:</span> <span class="s2">&#34;tcp&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;security&#34;</span><span class="p">:</span> <span class="s2">&#34;reality&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;realitySettings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;serverName&#34;</span><span class="p">:</span> <span class="s2">&#34;www.amazon.com&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;publicKey&#34;</span><span class="p">:</span> <span class="s2">&#34;你的公钥&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;shortId&#34;</span><span class="p">:</span> <span class="s2">&#34;你的short-id&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;fingerprint&#34;</span><span class="p">:</span> <span class="s2">&#34;chrome&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>启动：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">systemctl start xray <span class="o">&amp;&amp;</span> systemctl <span class="nb">enable</span> xray
+</span></span></code></pre></div><p>使用代理：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">https_proxy</span><span class="o">=</span>http://127.0.0.1:10809
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">http_proxy</span><span class="o">=</span>http://127.0.0.1:10809
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">all_proxy</span><span class="o">=</span>socks5://127.0.0.1:10808
+</span></span></code></pre></div><p>================================================================================</p>
+<p>十一、批量一键部署（多台服务器）</p>
+<p>保存为 deploy.sh：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="nv">PORT</span><span class="o">=</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="nv">2053</span><span class="si">}</span>
+</span></span><span class="line"><span class="cl"><span class="nv">USER</span><span class="o">=</span><span class="si">${</span><span class="nv">2</span><span class="k">:-</span><span class="nv">admin</span><span class="si">}</span>
+</span></span><span class="line"><span class="cl"><span class="nv">PASS</span><span class="o">=</span><span class="si">${</span><span class="nv">3</span><span class="k">:-</span><span class="nv">admin</span><span class="si">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">yum update -y <span class="o">&amp;&amp;</span> yum install -y curl wget socat
+</span></span><span class="line"><span class="cl">setenforce <span class="m">0</span> 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">sed -i <span class="s1">&#39;s/SELINUX=enforcing/SELINUX=disabled/g&#39;</span> /etc/selinux/config
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">bash &lt;<span class="o">(</span>curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh<span class="o">)</span> <span class="s">&lt;&lt;EOF
+</span></span></span><span class="line"><span class="cl"><span class="s">y
+</span></span></span><span class="line"><span class="cl"><span class="s">$USER
+</span></span></span><span class="line"><span class="cl"><span class="s">$PASS
+</span></span></span><span class="line"><span class="cl"><span class="s">$PORT
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wget --no-check-certificate -O /root/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh
+</span></span><span class="line"><span class="cl">chmod +x /root/bbr.sh <span class="o">&amp;&amp;</span> bash /root/bbr.sh <span class="o">&lt;&lt;&lt;</span> <span class="s2">&#34;y&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">systemctl start firewalld 2&gt;/dev/null
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span><span class="si">${</span><span class="nv">PORT</span><span class="si">}</span>/tcp
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>443/tcp
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>443/udp
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>80/tcp
+</span></span><span class="line"><span class="cl">firewall-cmd --permanent --add-port<span class="o">=</span>2096/tcp
+</span></span><span class="line"><span class="cl">firewall-cmd --reload
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">x-ui restart
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;============================================&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;  部署完成！&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;  面板：http://</span><span class="k">$(</span>curl -s ifconfig.me<span class="k">)</span><span class="s2">:</span><span class="si">${</span><span class="nv">PORT</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;  用户名：</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">  密码：</span><span class="si">${</span><span class="nv">PASS</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;  ⚠️ 请 reboot 使 BBR 生效&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;  ⚠️ 云安全组放行端口：</span><span class="si">${</span><span class="nv">PORT</span><span class="si">}</span><span class="s2">、443、80、2096&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;============================================&#34;</span>
+</span></span></code></pre></div><p>批量执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="k">for</span> IP in <span class="k">$(</span>cat ips.txt<span class="k">)</span><span class="p">;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    scp deploy.sh root@<span class="nv">$IP</span>:/root/
+</span></span><span class="line"><span class="cl">    ssh root@<span class="nv">$IP</span> <span class="s2">&#34;bash /root/deploy.sh 21568 myadmin Mypass2026!&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">done</span>
+</span></span></code></pre></div><p>================================================================================</p>
+<p>十二、踩坑总结</p>
+<table>
+  <thead>
+      <tr>
+          <th>坑</th>
+          <th>症状</th>
+          <th>解决</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>SELinux 没关</td>
+          <td>面板/节点装好了但连不上</td>
+          <td>安装前先 setenforce 0 + 修改配置</td>
+      </tr>
+      <tr>
+          <td>内核 3.10</td>
+          <td>BBR 开不了</td>
+          <td>用 bbr.sh 一键脚本，不要手动装 ELRepo</td>
+      </tr>
+      <tr>
+          <td>ELRepo 装不上</td>
+          <td>手动升内核失败</td>
+          <td>用 bbr.sh 脚本绕过</td>
+      </tr>
+      <tr>
+          <td>firewalld</td>
+          <td>用 ufw 命令报错</td>
+          <td>CentOS 用 firewall-cmd</td>
+      </tr>
+      <tr>
+          <td>云安全组</td>
+          <td>面板/节点/订阅都连不上</td>
+          <td>云控制台安全组放行端口</td>
+      </tr>
+      <tr>
+          <td>Clash 订阅导入失败</td>
+          <td>用了 /sub/ 链接</td>
+          <td>Clash 必须用 /clash/ 路径</td>
+      </tr>
+      <tr>
+          <td>v2ray 订阅导入失败</td>
+          <td>用了 /clash/ 链接</td>
+          <td>v2ray 必须用 /sub/ 路径</td>
+      </tr>
+      <tr>
+          <td>订阅链接只有一种格式</td>
+          <td>面板只开了一个订阅</td>
+          <td>常规和 Clash 两个都要开启</td>
+      </tr>
+      <tr>
+          <td>/clash/ 路径改成 /sub/</td>
+          <td>格式冲突两个客户端都炸</td>
+          <td>保持默认，/sub/ 和 /clash/ 各管各的</td>
+      </tr>
+      <tr>
+          <td>Trojan 用 443 端口</td>
+          <td>跟 VLESS Reality 冲突</td>
+          <td>不同协议用不同端口</td>
+      </tr>
+      <tr>
+          <td>Trojan 证书验证失败</td>
+          <td>Clash 连不上 Trojan</td>
+          <td>skip-cert-verify: true</td>
+      </tr>
+      <tr>
+          <td>Clash Local 配置没刷新按钮</td>
+          <td>本地文件无法自动刷新</td>
+          <td>改用 Remote 订阅，或手动编辑</td>
+      </tr>
+      <tr>
+          <td>私钥泄露</td>
+          <td>安全风险</td>
+          <td>重新点 X25519 生成新密钥</td>
+      </tr>
+  </tbody>
+</table>
+<p>================================================================================</p>
+<p>十三、面板管理命令</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">x-ui                               <span class="c1"># 管理菜单</span>
+</span></span><span class="line"><span class="cl">x-ui restart                       <span class="c1"># 重启面板</span>
+</span></span><span class="line"><span class="cl">x-ui status                        <span class="c1"># 查看状态</span>
+</span></span><span class="line"><span class="cl">/usr/local/x-ui/x-ui setting -show <span class="c1"># 查看设置</span>
+</span></span></code></pre></div><p>================================================================================</p>
+<p>十四、协议对比</p>
+<table>
+  <thead>
+      <tr>
+          <th>协议</th>
+          <th>防封锁</th>
+          <th>配置难度</th>
+          <th>客户端兼容</th>
+          <th>推荐场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>VLESS Reality</td>
+          <td>★★★★★</td>
+          <td>中等</td>
+          <td>v2rayN/v2rayNG/Clash Meta</td>
+          <td>个人用、防封锁优先</td>
+      </tr>
+      <tr>
+          <td>Trojan</td>
+          <td>★★★★</td>
+          <td>简单</td>
+          <td>所有客户端</td>
+          <td>多设备、Clash 用户</td>
+      </tr>
+  </tbody>
+</table>
+<p>建议两个都加，v2ray 用 VLESS Reality，Clash 用 Trojan。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/">服务器</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">Wanzf&#39;s Blog</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
