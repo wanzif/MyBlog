@@ -78,4 +78,5 @@ if %errorlevel% equ 0 (
     echo.
 )
 
+git status
 pause
