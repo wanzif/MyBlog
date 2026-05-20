@@ -1,21 +1,21 @@
 /* ============================================================
-   文章目录侧边栏样式（优化版）
-   - 大屏幕显示固定侧边栏目录
-   - 中等屏幕显示可展开/收起的浮动按钮
-   - 小屏幕使用文章内嵌目录
+   文章目录侧边栏样式（优化版 v2）
+   - 大屏：右侧固定侧边栏，不压缩文章宽度
+   - 中屏：浮动按钮弹出目录面板
+   - 小屏：使用文章内嵌目录
    ============================================================ */
 
 /* ---- 侧边栏目录容器 ---- */
 .toc-sidebar {
     position: fixed;
-    right: 24px;
+    right: max(20px, calc((100vw - 720px) / 2 - 270px));
     top: 80px;
-    width: 260px;
+    width: 240px;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
     z-index: 90;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 1;
+    transition: opacity 0.3s ease;
+    display: none;
 }
 
 /* 目录卡片样式 */
@@ -185,7 +185,7 @@
 
 /* ---- 响应式断点 ---- */
 
-/* 大屏幕（>1200px）：显示固定侧边栏，隐藏浮动按钮 */
+/* 大屏幕（>1200px）：显示固定侧边栏，不压缩文章宽度 */
 @media (min-width: 1201px) {
     .toc-sidebar {
         display: block;
@@ -194,13 +194,9 @@
     .toc-popup {
         display: none !important;
     }
-    /* 文章内容区为侧边栏留出空间 */
-    .post-single .post-content {
-        margin-right: 280px;
-    }
 }
 
-/* 中等屏幕（768px-1200px）：隐藏侧边栏，显示浮动按钮 */
+/* 中等屏幕（769px-1200px）：浮动按钮 */
 @media (max-width: 1200px) and (min-width: 769px) {
     .toc-sidebar {
         display: none !important;
@@ -208,22 +204,15 @@
     .toc-float-btn {
         display: flex;
     }
-    .post-single .post-content {
-        margin-right: 0;
-    }
 }
 
-/* 小屏幕（<768px）：侧边栏和浮动按钮都隐藏，使用文章内嵌目录 */
+/* 小屏幕（<769px）：使用文章内嵌目录 */
 @media (max-width: 768px) {
     .toc-sidebar,
     .toc-float-btn,
     .toc-popup {
         display: none !important;
     }
-    .post-single .post-content {
-        margin-right: 0;
-    }
-    /* 恢复文章内嵌目录 */
     .post-content .toc {
         display: block !important;
     }
