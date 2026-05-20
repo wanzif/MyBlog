@@ -1,31 +1,26 @@
 /* ============================================================
    wanzf.com 全局样式覆盖
-   解决文章宽度偏窄、内容与评论/分享区不对齐的问题
+   解决文章宽度偏窄问题
    ============================================================ */
 
-/* 全局内容区加宽 */
-:root {
-    --main-width: 780px;
+/* 加宽主内容区 */
+.main {
+    max-width: 780px;
 }
 
 @media (min-width: 1201px) {
-    :root {
-        --main-width: 820px;
+    .main {
+        max-width: 850px;
     }
 }
 
 @media (min-width: 1400px) {
-    :root {
-        --main-width: 860px;
+    .main {
+        max-width: 900px;
     }
 }
 
-/* 确保文章正文、代码块、表格等都使用一致的宽度 */
-.post-content {
-    max-width: var(--main-width);
-}
-
-/* Giscus 评论框宽度与文章对齐（移除 iframe 的额外 padding） */
+/* 评论 iframe 与文章宽度对齐 */
 .post-content iframe[title="Comments"] {
     max-width: 100% !important;
 }
