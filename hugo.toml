@@ -70,8 +70,9 @@ enableInlineShortcodes = true
 [params]
   # ---------- 基本信息 ----------
   env = "production"                   # 环境：production 启用 SEO 功能
-  description = "技术分享、一起进步"    # 网站描述（SEO 用）
+  description = "技术分享、一起进步 | 网络技术 · AI自动化 · 脚本开发"    # 网站描述（SEO 用）
   author = "Wanzf"                      # 作者名称
+  keywords = ["技术博客", "网络技术", "AI自动化", "脚本开发", "服务器搭建"]  # SEO 关键词
 
 
   # 显示分享按钮（文章底部）
@@ -140,6 +141,7 @@ enableInlineShortcodes = true
     theme = "preferred_color_scheme"
     lang = "zh-CN"
     loading = "lazy"
+    crossorigin = "anonymous"
 
 
   # ---------- 功能开关（全部开启）----------
@@ -169,8 +171,7 @@ enableInlineShortcodes = true
   # 显示标签
   showTaxonomyTags = true
 
-  # 开启搜索功能
-  enableSearch = true
+  # 搜索功能（通过 outputs.home 的 JSON 格式实现，无需额外开关）
 
   # ---------- 数学公式支持 ----------
   # 开启 LaTeX 数学公式渲染
