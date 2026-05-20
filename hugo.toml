@@ -229,31 +229,23 @@ enableInlineShortcodes = true
 
   # 代码高亮配置
   [markup.highlight]
-    # 是否禁用 CSS 类，false 表示使用 CSS 类
-    # 设置为 false 可以自定义代码高亮样式
-    noClasses = false
+    # noClasses = true 使用内联样式（不依赖主题 CSS 加载），保证高亮始终生效
+    noClasses = true
     
-    # 代码高亮主题，onedark 是一个流行的深色主题
-    # 其他可选主题：monokai、github、dracula 等
-    style = "onedark"
+    # 代码高亮主题：monokai 经典暗色风格，语言区分度高
+    style = "monokai"
     
-    # 是否启用代码围栏，true 表示启用
+    # 启用代码围栏
     codeFences = true
     
-    # 是否猜测代码语言，true 表示启用
+    # 自动猜测语言
     guessSyntax = true
     
-    # 是否显示行号，true 表示显示
-    # lineNos = true
+    # 显示行号
+    lineNos = false
     
     # 行号起始数字
-    # lineNoStart = 1
-    
-    # 行号在表格中，true 表示启用
-    # lineNumbersInTable = true
-    
-    # 是否启用锚点行号，true 表示启用
-    # anchorLineNos = true
+    lineNoStart = 1
 
 # ------------------------------------------------------------
 # 网站地图配置（可选）

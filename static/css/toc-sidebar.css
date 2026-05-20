@@ -1,24 +1,25 @@
 /* ============================================================
-   文章目录侧边栏样式（优化版 v2）
-   - 大屏：右侧固定侧边栏，不压缩文章宽度
-   - 中屏：浮动按钮弹出目录面板
-   - 小屏：使用文章内嵌目录
+   文章目录侧边栏样式（优化版 v3）
+   - 宽屏 (≥1450px)：固定右侧边栏，基于 .main 右边缘定位
+   - 中屏 (769-1449px)：浮动按钮弹出目录面板
+   - 小屏 (<769px)：文章内嵌目录
    ============================================================ */
 
 /* ---- 侧边栏目录容器 ---- */
 .toc-sidebar {
     position: fixed;
-    right: max(20px, calc((100vw - 720px) / 2 - 270px));
+    /* 定位在 .main (900px centered) 右边缘 + 24px gap */
+    left: calc(50vw + 450px + 24px);
     top: 80px;
     width: 240px;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
     z-index: 90;
-    transition: opacity 0.3s ease;
+    opacity: 1;
     display: none;
 }
 
-/* 目录卡片样式 */
+/* 目录卡片 */
 .toc-sidebar .toc-card {
     background: var(--theme);
     border: 1px solid var(--border);
@@ -46,14 +47,12 @@
     font-size: 1em;
     padding: 2px 6px;
     border-radius: 4px;
-    transition: background 0.2s;
 }
 
 .toc-sidebar .toc-title .toc-collapse-btn:hover {
     background: var(--code-bg);
 }
 
-/* 目录列表样式 */
 .toc-sidebar .toc-content ul {
     list-style: none;
     padding-left: 0;
@@ -70,7 +69,6 @@
     line-height: 1.5;
 }
 
-/* 目录链接样式 */
 .toc-sidebar .toc-content a {
     color: var(--secondary);
     text-decoration: none;
@@ -89,7 +87,6 @@
     background: var(--code-bg);
 }
 
-/* 当前激活的目录项 */
 .toc-sidebar .toc-content a.active {
     color: var(--primary);
     background: var(--code-bg);
@@ -97,12 +94,11 @@
     border-left: 3px solid var(--primary);
 }
 
-/* 折叠动画 */
 .toc-sidebar .toc-content.collapsed {
     display: none;
 }
 
-/* ---- 中等屏幕浮动按钮 ---- */
+/* ---- 浮动按钮 ---- */
 .toc-float-btn {
     display: none;
     position: fixed;
@@ -118,9 +114,9 @@
     font-size: 1.2em;
     z-index: 91;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s;
 }
 
 .toc-float-btn:hover {
@@ -128,7 +124,7 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* 中等屏幕的弹出目录面板 */
+/* 弹出目录面板 */
 .toc-popup {
     display: none;
     position: fixed;
@@ -168,7 +164,6 @@
     display: block;
     padding: 3px 8px;
     border-radius: 4px;
-    transition: all 0.15s ease;
 }
 
 .toc-popup .toc-content a:hover {
@@ -185,8 +180,8 @@
 
 /* ---- 响应式断点 ---- */
 
-/* 大屏幕（>1200px）：显示固定侧边栏，不压缩文章宽度 */
-@media (min-width: 1201px) {
+/* 宽屏 (≥1450px)：固定侧边栏 */
+@media (min-width: 1450px) {
     .toc-sidebar {
         display: block;
     }
@@ -196,8 +191,8 @@
     }
 }
 
-/* 中等屏幕（769px-1200px）：浮动按钮 */
-@media (max-width: 1200px) and (min-width: 769px) {
+/* 中屏 (769-1449px)：浮动按钮 */
+@media (max-width: 1449px) and (min-width: 769px) {
     .toc-sidebar {
         display: none !important;
     }
@@ -206,7 +201,7 @@
     }
 }
 
-/* 小屏幕（<769px）：使用文章内嵌目录 */
+/* 小屏 (<769px)：文章内嵌目录 */
 @media (max-width: 768px) {
     .toc-sidebar,
     .toc-float-btn,
