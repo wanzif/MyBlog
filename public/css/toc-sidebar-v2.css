@@ -1,0 +1,236 @@
+/* ============================================================
+   文章目录侧边栏样式（优化版 v3）
+   - 宽屏 (≥1450px)：固定右侧边栏，基于 .main 右边缘定位
+   - 中屏 (769-1449px)：浮动按钮弹出目录面板
+   - 小屏 (<769px)：文章内嵌目录
+   ============================================================ */
+
+/* ---- 侧边栏目录容器 ---- */
+.toc-sidebar {
+    position: fixed;
+    /* 定位在 .main (900px centered) 右边缘 + 24px gap */
+    left: calc(50vw + 450px + 24px);
+    top: 80px;
+    width: 240px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    z-index: 90;
+    opacity: 1;
+    display: none;
+}
+
+/* 目录卡片 */
+.toc-sidebar .toc-card {
+    background: var(--theme);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 目录标题 */
+.toc-sidebar .toc-title {
+    font-weight: 700;
+    font-size: 0.95em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--primary);
+}
+
+.toc-sidebar .toc-title .toc-collapse-btn {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    cursor: pointer;
+    font-size: 1em;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.toc-sidebar .toc-title .toc-collapse-btn:hover {
+    background: var(--code-bg);
+}
+
+.toc-sidebar .toc-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.toc-sidebar .toc-content ul ul {
+    padding-left: 14px;
+    margin-top: 4px;
+}
+
+.toc-sidebar .toc-content li {
+    margin: 6px 0;
+    line-height: 1.5;
+}
+
+.toc-sidebar .toc-content a {
+    color: var(--secondary);
+    text-decoration: none;
+    font-size: 0.85em;
+    display: block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toc-sidebar .toc-content a:hover {
+    color: var(--primary);
+    background: var(--code-bg);
+}
+
+.toc-sidebar .toc-content a.active {
+    color: var(--primary);
+    background: var(--code-bg);
+    font-weight: 600;
+    border-left: 3px solid var(--primary);
+}
+
+.toc-sidebar .toc-content.collapsed {
+    display: none;
+}
+
+/* ---- 浮动按钮 ---- */
+.toc-float-btn {
+    display: none;
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    z-index: 91;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.toc-float-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* 弹出目录面板 */
+.toc-popup {
+    display: none;
+    position: fixed;
+    right: 20px;
+    bottom: 134px;
+    width: 280px;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 92;
+    background: var(--theme);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.toc-popup .toc-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.toc-popup .toc-content ul ul {
+    padding-left: 14px;
+    margin-top: 4px;
+}
+
+.toc-popup .toc-content li {
+    margin: 6px 0;
+    line-height: 1.5;
+}
+
+.toc-popup .toc-content a {
+    color: var(--secondary);
+    text-decoration: none;
+    font-size: 0.85em;
+    display: block;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.toc-popup .toc-content a:hover {
+    color: var(--primary);
+    background: var(--code-bg);
+}
+
+.toc-popup .toc-content a.active {
+    color: var(--primary);
+    background: var(--code-bg);
+    font-weight: 600;
+    border-left: 3px solid var(--primary);
+}
+
+/* ---- 响应式断点 ---- */
+
+/* 宽屏 (≥1450px)：固定侧边栏 */
+@media (min-width: 1450px) {
+    .toc-sidebar {
+        display: block;
+    }
+    .toc-float-btn,
+    .toc-popup {
+        display: none !important;
+    }
+}
+
+/* 中屏 (769-1449px)：浮动按钮 */
+@media (max-width: 1449px) and (min-width: 769px) {
+    .toc-sidebar {
+        display: none !important;
+    }
+    .toc-float-btn {
+        display: flex;
+    }
+}
+
+/* 小屏 (<769px)：文章内嵌目录 */
+@media (max-width: 768px) {
+    .toc-sidebar,
+    .toc-float-btn,
+    .toc-popup {
+        display: none !important;
+    }
+    .post-content .toc {
+        display: block !important;
+    }
+}
+
+/* 滚动条美化 */
+.toc-sidebar::-webkit-scrollbar,
+.toc-popup::-webkit-scrollbar {
+    width: 4px;
+}
+
+.toc-sidebar::-webkit-scrollbar-track,
+.toc-popup::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.toc-sidebar::-webkit-scrollbar-thumb,
+.toc-popup::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+.toc-sidebar::-webkit-scrollbar-thumb:hover,
+.toc-popup::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary);
+}

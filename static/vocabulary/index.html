@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ogden's Basic English - 850 核心词汇学习手册">
+<title>Ogden's Basic English · 基础英语词汇</title>
+<style>
+/* ===== CSS Variables ===== */
+:root {
+  --paper: #f5efe4;
+  --paper-soft: #fbf7ef;
+  --ink: #1d1a16;
+  --muted: #7b766f;
+  --line: #e5dccd;
+  --accent: #b85b12;
+  --accent-soft: #fff1c7;
+  --accent-glow: rgba(184, 91, 18, 0.08);
+  --success: #5a8f3c;
+  --card-shadow: 0 1px 3px rgba(29, 26, 22, 0.06), 0 1px 2px rgba(29, 26, 22, 0.04);
+  --card-shadow-hover: 0 4px 12px rgba(29, 26, 22, 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 220ms ease;
+}
+
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Hero ===== */
+.hero {
+  text-align: center;
+  padding: 3rem 1.5rem 2rem;
+}
+.hero-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.hero h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+.hero-sub {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ===== Study Bar ===== */
+.studybar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  padding: 0.75rem 1.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.sb-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.sb-left { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.sb-right { display: flex; gap: 0.5rem; align-items: center; }
+
+/* Search */
+.search-wrap {
+  position: relative;
+}
+.search-wrap input {
+  width: 220px;
+  padding: 0.5rem 0.75rem 0.5rem 2.2rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-soft);
+  font-size: 0.9rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.search-wrap input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.search-wrap .search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+/* Category Tabs */
+.cat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.cat-tab {
+  padding: 0.35rem 0.75rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  font-family: inherit;
+}
+.cat-tab:hover { border-color: var(--accent); color: var(--accent); }
+.cat-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.cat-tab .count { opacity: 0.7; font-size: 0.7rem; margin-left: 0.2rem; }
+
+/* Buttons */
+.btn {
+  padding: 0.4rem 0.85rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-soft);
+  color: var(--ink);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.btn.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.accent:hover { opacity: 0.9; }
+
+/* Progress */
+.progress-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #d4751a);
+  border-radius: 999px;
+  transition: width 320ms ease;
+}
+
+/* ===== Word Grid ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem;
+}
+.section-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--ink);
+  color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.section-title .desc {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--muted);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.word-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+/* Word Card */
+.word-card {
+  background: var(--paper-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 80px;
+}
+.word-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-1px);
+}
+.word-card.learned {
+  border-left: 3px solid var(--muted);
+  opacity: 0.7;
+}
+.word-card:not(.learned) {
+  border-left: 3px solid var(--accent);
+}
+.word-card .card-front { display: flex; flex-direction: column; gap: 0.3rem; }
+.word-card .card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.word-card .emoji { font-size: 1.3rem; line-height: 1; }
+.word-card .word-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.word-card .card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.word-card .pos-tag {
+  padding: 0.1rem 0.4rem;
+  background: var(--accent-soft);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+.word-card .card-back {
+  display: none;
+  margin-top: 0.4rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+.word-card .phonetic {
+  font-family: 'Courier New', 'Lucida Sans Typewriter', monospace;
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.02em;
+}
+.word-card.flipped .card-back { display: block; }
+.word-card .example-en {
+  color: var(--ink);
+  font-style: italic;
+  margin-bottom: 0.25rem;
+}
+.word-card .example-zh { color: var(--muted); font-size: 0.8rem; }
+.word-card .freq-stars {
+  color: var(--accent);
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+}
+.word-card .card-actions {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.65rem;
+  display: flex;
+  gap: 0.35rem;
+}
+.word-card .action-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.word-card .action-btn:hover { background: var(--accent-glow); color: var(--accent); }
+.word-card .action-btn.learned-btn { font-size: 0.9rem; }
+.word-card .action-btn.learned-btn.checked { color: var(--success); }
+
+/* ===== Card View (Memorization Mode) ===== */
+.card-view .word-grid {
+  grid-template-columns: 1fr;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.card-view .word-card {
+  padding: 1.5rem 2rem;
+  min-height: 120px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-left: 1px solid var(--line) !important;
+}
+.card-view .word-card .word-text {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+}
+.card-view .word-card .emoji { font-size: 2rem; }
+.card-view .word-card .card-meta { justify-content: center; font-size: 0.9rem; }
+.card-view .word-card .card-back { text-align: center; font-size: 1rem; }
+.card-view .word-card .phonetic { font-size: 1.2rem; }
+
+/* Memorization mode: hide meaning until click */
+.memorize-mode .word-card .card-meta { display: none; }
+.memorize-mode .word-card.revealed .card-meta { display: flex; }
+.memorize-mode .word-card .card-back { display: none; }
+.memorize-mode .word-card.revealed .card-back { display: block; }
+
+/* ===== Empty / No Results ===== */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+.empty-state .emoji { font-size: 3rem; margin-bottom: 0.75rem; }
+.empty-state p { font-size: 1rem; }
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+  z-index: 999;
+}
+.toast.show { opacity: 1; }
+
+/* ===== Responsive ===== */
+@media (max-width: 680px) {
+  .hero { padding: 2rem 1rem 1.5rem; }
+  .studybar { padding: 0.6rem 1rem; }
+  .sb-inner { flex-direction: column; }
+  .sb-left { width: 100%; }
+  .sb-right { width: 100%; justify-content: flex-start; }
+  .search-wrap { width: 100%; }
+  .search-wrap input { width: 100%; }
+  .word-grid { grid-template-columns: 1fr; }
+  .card-view .word-card { padding: 1.25rem 1.5rem; }
+  .card-view .word-card .word-text { font-size: clamp(1.8rem, 5vw, 3rem); }
+  .progress-bar { padding: 0.5rem 1rem 0; }
+  .container { padding: 0.75rem 1rem 2rem; }
+}
+
+/* ===== Print ===== */
+@media print {
+  .studybar, .progress-bar, .footer, .card-actions { display: none; }
+  .word-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-label">A controlled language for the world · 1930</div>
+  <h1>Ogden's <em>Basic</em> English</h1>
+  <p class="hero-sub">850 词学习手册 · 分类记忆 · 背诵模式 · 进度追踪</p>
+</header>
+
+<!-- Study Bar -->
+<div class="studybar">
+  <div class="sb-inner">
+    <div class="sb-left">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="searchInput" placeholder="搜索单词..." autocomplete="off" aria-label="搜索单词">
+      </div>
+      <div class="cat-tabs" id="catTabs"></div>
+    </div>
+    <div class="sb-right">
+      <button class="btn" id="viewToggle" title="切换列表/背诵视图">📋 列表</button>
+      <button class="btn" id="unlearnedToggle">只看未学</button>
+      <button class="btn" id="memorizeToggle">🧠 背诵</button>
+      <button class="btn accent" id="downloadBtn">⬇ 导出</button>
+    </div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress-bar">
+  <span id="progressText">已学习 0 / 850</span>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <span id="progressPercent">0%</span>
+</div>
+
+<!-- Word Container -->
+<div class="container" id="wordContainer" aria-live="polite"></div>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>Based on Charles Kay Ogden's <strong>Basic English</strong> word list (1930).</p>
+  <p>词汇释义参考 <a href="https://github.com/HANXU2018/BASIC-ENGLISH-VOCABULARY" target="_blank" rel="noopener">HANXU2018/BASIC-ENGLISH-VOCABULARY</a></p>
+  <p style="margin-top:0.5rem"><a href="/">← 返回博客</a></p>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+// ===== State =====
+const STORAGE_KEY = 'ogden_vocab_state';
+let state = {
+  learned: new Set(),
+  currentCat: 'all',
+  searchQuery: '',
+  viewMode: 'list',        // 'list' | 'card'
+  unlearnedOnly: false,
+  memorizeMode: false,
+  lastVisit: null
+};
+
+// Load state from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.learned = new Set(parsed.learned || []);
+      state.currentCat = parsed.currentCat || 'all';
+      state.searchQuery = parsed.searchQuery || '';
+      state.viewMode = parsed.viewMode || 'list';
+      state.unlearnedOnly = parsed.unlearnedOnly || false;
+      state.memorizeMode = parsed.memorizeMode || false;
+      state.lastVisit = parsed.lastVisit || null;
+      // Restore UI
+      document.getElementById('searchInput').value = state.searchQuery;
+      if (state.unlearnedOnly) document.getElementById('unlearnedToggle').classList.add('active');
+      if (state.memorizeMode) document.getElementById('memorizeToggle').classList.add('active');
+    }
+  } catch (e) { /* ignore */ }
+}
+
+function saveState() {
+  state.lastVisit = new Date().toISOString();
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      learned: Array.from(state.learned),
+      currentCat: state.currentCat,
+      searchQuery: state.searchQuery,
+      viewMode: state.viewMode,
+      unlearnedOnly: state.unlearnedOnly,
+      memorizeMode: state.memorizeMode,
+      lastVisit: state.lastVisit
+    }));
+  } catch (e) { /* ignore */ }
+}
+
+// ===== Toast =====
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ===== TTS =====
+function speakWord(word) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+// ===== Render =====
+const categories = [
+  { id: 'all', title: '全部', zh: 'All', tag: 'ALL', wordCount: 0 },
+  { id: 'operations', title: 'Operations', zh: '操作词', tag: 'OP', wordCount: 0 },
+  { id: 'general', title: 'General Things', zh: '通用词', tag: 'GEN', wordCount: 0 },
+  { id: 'picturable', title: 'Picturable Things', zh: '图示词', tag: 'PIC', wordCount: 0 },
+  { id: 'qualities', title: 'Qualities', zh: '性质词', tag: 'QL', wordCount: 0 },
+  { id: 'opposites', title: 'Opposites', zh: '反义对', tag: 'OPP', wordCount: 0 }
+];
+
+// Count words per category
+categories.forEach(c => {
+  if (c.id === 'all') c.wordCount = WORDS.length;
+  else c.wordCount = WORDS.filter(w => w.categoryId === c.id).length;
+});
+
+// Render category tabs
+const catTabs = document.getElementById('catTabs');
+categories.forEach(c => {
+  const btn = document.createElement('button');
+  btn.className = 'cat-tab' + (c.id === state.currentCat ? ' active' : '');
+  btn.innerHTML = `${c.tag}<span class="count">${c.wordCount}</span>`;
+  btn.title = `${c.title} · ${c.zh}`;
+  btn.addEventListener('click', () => {
+    state.currentCat = c.id;
+    state.searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    renderAll();
+  });
+  catTabs.appendChild(btn);
+});
+
+// Filter words
+function getFilteredWords() {
+  let words = WORDS;
+  if (state.currentCat !== 'all') {
+    words = words.filter(w => w.categoryId === state.currentCat);
+  }
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    words = words.filter(w =>
+      w.word.toLowerCase().includes(q) ||
+      w.translation.includes(q) ||
+      w.example.toLowerCase().includes(q) ||
+      w.exampleZh.includes(q) ||
+      w.categoryZh.includes(q)
+    );
+  }
+  if (state.unlearnedOnly) {
+    words = words.filter(w => !state.learned.has(w.id));
+  }
+  return words;
+}
+
+// Render word grid
+function renderWords(words) {
+  const container = document.getElementById('wordContainer');
+  if (words.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="emoji">📭</div><p>没有找到匹配的单词</p></div>`;
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  words.forEach(w => {
+    if (!grouped[w.categoryId]) grouped[w.categoryId] = { meta: { title: w.categoryTitle, zh: w.categoryZh, tag: w.tag }, words: [] };
+    grouped[w.categoryId].words.push(w);
+  });
+
+  let html = '';
+  for (const [catId, group] of Object.entries(grouped)) {
+    if (state.currentCat === 'all') {
+      html += `<h2 class="section-title">${group.meta.title} <span class="desc">${group.meta.zh} · ${group.words.length} 词</span></h2>`;
+    }
+    html += `<div class="word-grid">`;
+    group.words.forEach(w => {
+      const isLearned = state.learned.has(w.id);
+      const freqStars = '★'.repeat(w.frequency) + '☆'.repeat(5 - w.frequency);
+      html += `
+        <div class="word-card${isLearned ? ' learned' : ''}" data-id="${w.id}" onclick="handleCardClick(event, this)" title="点击查看详情">
+          <div class="card-front">
+            <div class="card-top">
+              <span class="emoji">${w.emoji}</span>
+              <span class="word-text">${w.word}</span>
+            </div>
+            <div class="card-meta">
+              <span>${w.translation}</span>
+              <span class="pos-tag">${w.pos}</span>
+            </div>
+          </div>
+          <div class="card-back">
+            <div class="phonetic">${w.phonetic || ''}</div>
+            <div class="example-en">${w.example}</div>
+            <div class="example-zh">${w.exampleZh}</div>
+            <div class="freq-stars">${freqStars}</div>
+          </div>
+          <div class="card-actions" onclick="event.stopPropagation()">
+            <button class="action-btn" onclick="speakWord('${w.word}')" title="发音">♪</button>
+            <button class="action-btn learned-btn${isLearned ? ' checked' : ''}" onclick="toggleLearned('${w.id}')" title="${isLearned ? '标记未学' : '标记已学'}">${isLearned ? '✓' : '○'}</button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+
+  // Apply memorize mode
+  if (state.memorizeMode) {
+    container.parentElement.parentElement.classList.add('memorize-mode');
+    container.querySelectorAll('.word-card').forEach(card => card.classList.remove('revealed'));
+  } else {
+    container.parentElement.parentElement.classList.remove('memorize-mode');
+    container.querySelectorAll('.word-card').forEach(card => card.classList.add('revealed'));
+  }
+}
+
+// Handle card click
+function handleCardClick(event, card) {
+  if (state.memorizeMode) {
+    card.classList.toggle('revealed');
+  } else {
+    card.classList.toggle('flipped');
+  }
+}
+
+// Toggle learned
+function toggleLearned(id) {
+  if (state.learned.has(id)) {
+    state.learned.delete(id);
+  } else {
+    state.learned.add(id);
+    showToast('✓ 已标记为已学');
+  }
+  saveState();
+  renderAll();
+}
+
+// Update progress
+function updateProgress() {
+  const total = WORDS.length;
+  const learned = state.learned.size;
+  const pct = Math.round((learned / total) * 100);
+  document.getElementById('progressText').textContent = `已学习 ${learned} / ${total}`;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPercent').textContent = pct + '%';
+}
+
+// Render all
+function renderAll() {
+  updateProgress();
+  renderWords(getFilteredWords());
+  // Update active cat tab
+  document.querySelectorAll('.cat-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.textContent.startsWith(
+      categories.find(c => c.id === state.currentCat)?.tag || ''
+    ));
+  });
+  // Update view toggle
+  const vt = document.getElementById('viewToggle');
+  vt.textContent = state.viewMode === 'card' ? '🃏 卡片' : '📋 列表';
+  document.getElementById('wordContainer').parentElement.className =
+    'container' + (state.viewMode === 'card' ? ' card-view' : '');
+}
+
+// ===== Event Listeners =====
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  state.searchQuery = e.target.value;
+  saveState();
+  renderAll();
+});
+
+// Keyboard shortcut: / to focus search
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+});
+
+document.getElementById('viewToggle').addEventListener('click', () => {
+  state.viewMode = state.viewMode === 'card' ? 'list' : 'card';
+  document.getElementById('wordContainer').parentElement.className =
+    'container' + (state.viewMode === 'card' ? ' card-view' : '');
+  document.getElementById('viewToggle').textContent = state.viewMode === 'card' ? '🃏 卡片' : '📋 列表';
+  saveState();
+});
+
+document.getElementById('unlearnedToggle').addEventListener('click', function() {
+  state.unlearnedOnly = !state.unlearnedOnly;
+  this.classList.toggle('active');
+  this.textContent = state.unlearnedOnly ? '显示全部' : '只看未学';
+  saveState();
+  renderAll();
+});
+
+document.getElementById('memorizeToggle').addEventListener('click', function() {
+  state.memorizeMode = !state.memorizeMode;
+  this.classList.toggle('active');
+  this.textContent = state.memorizeMode ? '🧠 背诵中' : '🧠 背诵';
+  saveState();
+  renderAll();
+});
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const unlearned = WORDS.filter(w => !state.learned.has(w.id));
+  if (unlearned.length === 0) {
+    showToast('🎉 全部学完了！');
+    return;
+  }
+  const text = unlearned.map(w => `${w.word}\t${w.translation}\t${w.categoryTitle}`).join('\n');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ogden-remaining-words.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`⬇ 已导出 ${unlearned.length} 个未学词汇`);
+});
+
+// ===== Init =====
+loadState();
+renderAll();
+
+// Show last visit
+if (state.lastVisit) {
+  const d = new Date(state.lastVisit);
+  document.getElementById('progressText').textContent +=
+    `  ·  上次：${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+</script>
+</body>
+</html>

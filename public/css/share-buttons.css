@@ -1,89 +1,48 @@
 /* ============================================================
-   社交分享按钮样式优化
+   国内社交平台分享按钮样式（优化版）
    ============================================================ */
 
-/* 分享按钮容器 */
-.post-share {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
-
-/* 分享按钮样式 */
-.post-share a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    margin: 5px;
-    border-radius: 50%;
-    background: var(--code-bg);
-    color: var(--primary);
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-/* 悬停效果 */
-.post-share a:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* 不同平台的颜色 */
-.post-share a.twitter:hover { background: #1DA1F2; color: white; }
-.post-share a.facebook:hover { background: #4267B2; color: white; }
-.post-share a.linkedin:hover { background: #0077B5; color: white; }
-.post-share a.reddit:hover { background: #FF4500; color: white; }
-.post-share a.weibo:hover { background: #E6162D; color: white; }
-.post-share a.wechat:hover { background: #07C160; color: white; }
-
-
-/* ============================================================
-   国内社交平台分享按钮样式
-   ============================================================ */
-
-/* 分享按钮容器 */
 .custom-share-buttons {
     margin-top: 40px;
-    padding: 20px;
+    padding: 20px 0;
     border-top: 1px solid var(--border);
-    text-align: center;
 }
 
-.share-title {
+.custom-share-buttons .share-title {
     display: block;
-    margin-bottom: 15px;
-    font-weight: bold;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 0.95em;
     color: var(--primary);
 }
 
-/* 单个分享按钮 */
 .share-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 5px;
-    padding: 10px 15px;
-    border-radius: 8px;
+    margin: 4px;
+    padding: 8px 14px;
+    border-radius: 20px;
     color: white;
     text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 0.9em;
+    transition: all 0.2s ease;
+    font-size: 0.85em;
 }
 
 .share-button:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
 }
 
 .share-icon {
     margin-right: 5px;
-    font-size: 1.2em;
+    font-size: 1.1em;
 }
 
 .share-name {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 /* 微信二维码弹窗 */
@@ -103,21 +62,23 @@
 .wechat-qrcode-content {
     background: var(--theme);
     border-radius: 12px;
-    padding: 20px;
-    max-width: 300px;
+    padding: 24px;
+    max-width: 320px;
     width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .wechat-qrcode-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .wechat-qrcode-header h3 {
     margin: 0;
     color: var(--primary);
+    font-size: 1.1em;
 }
 
 .wechat-qrcode-close {
@@ -126,27 +87,25 @@
     font-size: 24px;
     cursor: pointer;
     color: var(--secondary);
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.wechat-qrcode-close:hover {
+    color: var(--primary);
 }
 
 .wechat-qrcode-body {
     text-align: center;
 }
 
-#qrcode {
-    display: inline-block;
-    margin-bottom: 15px;
+#wechat-qr img {
+    border-radius: 8px;
 }
 
 .wechat-tip {
     color: var(--secondary);
-    font-size: 0.9em;
-}
-
-#qrcode input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--code-bg);
-    color: var(--primary);
+    font-size: 0.85em;
+    margin: 10px 0 0;
+    line-height: 1.5;
 }

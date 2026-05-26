@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>工具 on Wanzf&#39;s Blog</title>
+    <link>http://localhost:1313/tags/%E5%B7%A5%E5%85%B7/</link>
+    <description>Recent content in 工具 on Wanzf&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
+    <lastBuildDate>Tue, 26 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss" />
+    <item>
+      <title>Ogden&#39;s Basic English — 用 850 个单词说一口流利英语</title>
+      <link>http://localhost:1313/posts/2026-5-18-%E5%9F%BA%E7%A1%80%E8%8B%B1%E8%AF%AD%E8%AF%8D%E6%B1%87850-ogdens-basic-english/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2026-5-18-%E5%9F%BA%E7%A1%80%E8%8B%B1%E8%AF%AD%E8%AF%8D%E6%B1%87850-ogdens-basic-english/</guid>
+      <description>&lt;h2 id=&#34;一什么是-basic-english&#34;&gt;一、什么是 Basic English？&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;Basic English&lt;/strong&gt;（基础英语）由英国语言学家 &lt;strong&gt;Charles Kay Ogden&lt;/strong&gt; 于 1930 年提出。他的核心观点是：&lt;strong&gt;只需要 850 个精心挑选的单词，就足以表达日常生活中的几乎所有概念。&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;这个体系不是简单的&amp;quot;最常用 850 词&amp;quot;，而是经过语言学分析，确保 850 个词能覆盖日常交流的方方面面。二战期间，它曾被考虑用作国际辅助语言。&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;💡 &lt;strong&gt;在线学习工具&lt;/strong&gt;：我基于这个体系做了一个交互式词汇学习页面 → &lt;a href=&#34;http://localhost:1313/vocabulary/&#34;&gt;基础英语词汇学习工具&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二850-词的五大分类&#34;&gt;二、850 词的五大分类&lt;/h2&gt;&#xA;&lt;p&gt;Ogden 将 850 个词分为五类，每类有不同的学习重点：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th&gt;分类&lt;/th&gt;&#xA;          &lt;th&gt;数量&lt;/th&gt;&#xA;          &lt;th&gt;标签&lt;/th&gt;&#xA;          &lt;th&gt;说明&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Operations&lt;/strong&gt; 操作词&lt;/td&gt;&#xA;          &lt;td&gt;100&lt;/td&gt;&#xA;          &lt;td&gt;OP&lt;/td&gt;&#xA;          &lt;td&gt;动词、介词、连词、代词——句子的骨架&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;General Things&lt;/strong&gt; 通用词&lt;/td&gt;&#xA;          &lt;td&gt;400&lt;/td&gt;&#xA;          &lt;td&gt;GEN&lt;/td&gt;&#xA;          &lt;td&gt;抽象概念和一般事物名词&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Picturable Things&lt;/strong&gt; 图示词&lt;/td&gt;&#xA;          &lt;td&gt;200&lt;/td&gt;&#xA;          &lt;td&gt;PIC&lt;/td&gt;&#xA;          &lt;td&gt;看得见摸得着的具体事物&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Qualities&lt;/strong&gt; 性质词&lt;/td&gt;&#xA;          &lt;td&gt;100&lt;/td&gt;&#xA;          &lt;td&gt;QL&lt;/td&gt;&#xA;          &lt;td&gt;描述性质和状态的形容词&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Opposites&lt;/strong&gt; 反义对&lt;/td&gt;&#xA;          &lt;td&gt;50&lt;/td&gt;&#xA;          &lt;td&gt;OPP&lt;/td&gt;&#xA;          &lt;td&gt;成对出现的对立形容词&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;三完整词汇表&#34;&gt;三、完整词汇表&lt;/h2&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;表格字段说明：&lt;code&gt;pos&lt;/code&gt; 为词性缩写（v=动词, adj=形容词, n=名词, adv=副词, prep=介词, conj=连词, art=冠词, pron=代词, num=数词），★ 表示使用频率（1-5 星）。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

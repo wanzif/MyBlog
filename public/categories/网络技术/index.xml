@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Wanzf&#39;s Blog</title>
-    <link>http://localhost:1313/</link>
-    <description>Recent content on Wanzf&#39;s Blog</description>
+    <title>网络技术 on Wanzf&#39;s Blog</title>
+    <link>http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/</link>
+    <description>Recent content in 网络技术 on Wanzf&#39;s Blog</description>
     <generator>Hugo</generator>
     <language>zh</language>
-    <lastBuildDate>Tue, 26 May 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss" />
-    <item>
-      <title>Ogden&#39;s Basic English — 用 850 个单词说一口流利英语</title>
-      <link>http://localhost:1313/posts/2026-5-18-%E5%9F%BA%E7%A1%80%E8%8B%B1%E8%AF%AD%E8%AF%8D%E6%B1%87850-ogdens-basic-english/</link>
-      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/2026-5-18-%E5%9F%BA%E7%A1%80%E8%8B%B1%E8%AF%AD%E8%AF%8D%E6%B1%87850-ogdens-basic-english/</guid>
-      <description>&lt;h2 id=&#34;一什么是-basic-english&#34;&gt;一、什么是 Basic English？&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;Basic English&lt;/strong&gt;（基础英语）由英国语言学家 &lt;strong&gt;Charles Kay Ogden&lt;/strong&gt; 于 1930 年提出。他的核心观点是：&lt;strong&gt;只需要 850 个精心挑选的单词，就足以表达日常生活中的几乎所有概念。&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;这个体系不是简单的&amp;quot;最常用 850 词&amp;quot;，而是经过语言学分析，确保 850 个词能覆盖日常交流的方方面面。二战期间，它曾被考虑用作国际辅助语言。&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;💡 &lt;strong&gt;在线学习工具&lt;/strong&gt;：我基于这个体系做了一个交互式词汇学习页面 → &lt;a href=&#34;http://localhost:1313/vocabulary/&#34;&gt;基础英语词汇学习工具&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;二850-词的五大分类&#34;&gt;二、850 词的五大分类&lt;/h2&gt;&#xA;&lt;p&gt;Ogden 将 850 个词分为五类，每类有不同的学习重点：&lt;/p&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th&gt;分类&lt;/th&gt;&#xA;          &lt;th&gt;数量&lt;/th&gt;&#xA;          &lt;th&gt;标签&lt;/th&gt;&#xA;          &lt;th&gt;说明&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Operations&lt;/strong&gt; 操作词&lt;/td&gt;&#xA;          &lt;td&gt;100&lt;/td&gt;&#xA;          &lt;td&gt;OP&lt;/td&gt;&#xA;          &lt;td&gt;动词、介词、连词、代词——句子的骨架&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;General Things&lt;/strong&gt; 通用词&lt;/td&gt;&#xA;          &lt;td&gt;400&lt;/td&gt;&#xA;          &lt;td&gt;GEN&lt;/td&gt;&#xA;          &lt;td&gt;抽象概念和一般事物名词&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Picturable Things&lt;/strong&gt; 图示词&lt;/td&gt;&#xA;          &lt;td&gt;200&lt;/td&gt;&#xA;          &lt;td&gt;PIC&lt;/td&gt;&#xA;          &lt;td&gt;看得见摸得着的具体事物&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Qualities&lt;/strong&gt; 性质词&lt;/td&gt;&#xA;          &lt;td&gt;100&lt;/td&gt;&#xA;          &lt;td&gt;QL&lt;/td&gt;&#xA;          &lt;td&gt;描述性质和状态的形容词&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;strong&gt;Opposites&lt;/strong&gt; 反义对&lt;/td&gt;&#xA;          &lt;td&gt;50&lt;/td&gt;&#xA;          &lt;td&gt;OPP&lt;/td&gt;&#xA;          &lt;td&gt;成对出现的对立形容词&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;三完整词汇表&#34;&gt;三、完整词汇表&lt;/h2&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;表格字段说明：&lt;code&gt;pos&lt;/code&gt; 为词性缩写（v=动词, adj=形容词, n=名词, adv=副词, prep=介词, conj=连词, art=冠词, pron=代词, num=数词），★ 表示使用频率（1-5 星）。&lt;/p&gt;</description>
-    </item>
+    <lastBuildDate>Wed, 20 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/index.xml" rel="self" type="application/rss" />
     <item>
       <title>CentOS 7.9 搭建 3x-ui &#43; VLESS Reality / Trojan 教程</title>
       <link>http://localhost:1313/posts/2026-5-20-centos-7.9-%E5%AE%8C%E6%95%B4%E6%90%AD%E5%BB%BA-3x-ui-&#43;-vless-reality--trojan--%E6%95%99%E7%A8%8B/</link>
@@ -28,34 +21,6 @@
       <pubDate>Tue, 19 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/2026-5-19-%E6%A0%A1%E5%9B%ADwifi%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</guid>
       <description>&lt;h1 id=&#34;校园wifi优化实战指南&#34;&gt;校园WiFi优化实战指南&lt;/h1&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;从&amp;quot;全员吐槽&amp;quot;到&amp;quot;流畅上网&amp;quot;——一个真实校园WiFi改造项目的完整记录&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;写给谁看的？&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;本文面向&lt;strong&gt;零基础网络管理员&lt;/strong&gt;，假设你：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;听说过WiFi，但不知道信道、频宽是什么&lt;/li&gt;&#xA;&lt;li&gt;拿到一台AC（无线控制器）和一堆AP（无线接入点），不知道从哪下手&lt;/li&gt;&#xA;&lt;li&gt;遇到用户抱怨&amp;quot;WiFi卡&amp;quot;，不知道从哪排查&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;strong&gt;本文不讲什么？&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;不会讲深奥的无线通信原理（如OFDM、CSMA/CA），也不会列一堆公式。我们只讲&lt;strong&gt;实战中用得上的东西&lt;/strong&gt;——遇到什么问题，怎么排查，用什么命令，改什么参数，怎么验证。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;项目概况速览&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;项目&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;详情&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;场景&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;6层教学楼，60个教室 + 12个走廊&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;设备&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;锐捷AC WS6108 + 72台RG-AP730-L&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;用户数&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;880+ 终端同时连接&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;网络结构&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;管理VLAN 3997，用户VLAN 1101&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;优化前状态&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;连不上、卡顿、2.4G干扰严重&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;第一章先搞懂这些基本概念&#34;&gt;第一章：先搞懂这些基本概念&lt;/h2&gt;&#xA;&lt;p&gt;动手优化之前，我们需要先了解几个关键术语。这就像看病前要知道&amp;quot;血压&amp;quot;、&amp;ldquo;血糖&amp;quot;是什么指标一样。&lt;/p&gt;&#xA;&lt;h3 id=&#34;11-ap和ac是什么&#34;&gt;1.1 AP和AC是什么？&lt;/h3&gt;&#xA;&lt;p&gt;&lt;strong&gt;AP（Access Point）&lt;/strong&gt;：无线接入点，就是我们看到的那个吸顶或壁挂的WiFi设备。它的作用是&lt;strong&gt;发射无线信号，让手机/电脑能连上来&lt;/strong&gt;。通常安装在教室天花板中间位置。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;AC（Wireless Access Controller）&lt;/strong&gt;：无线控制器，可以理解为AP的&amp;quot;大脑&amp;rdquo;。所有AP的配置都通过AC统一下发，AP只管发射信号，管理全在AC。AC在网络拓扑中处于核心位置，连接所有AP，统一管理配置。&lt;/p&gt;&#xA;&lt;h3 id=&#34;12-什么是信道&#34;&gt;1.2 什么是信道？&lt;/h3&gt;&#xA;&lt;p&gt;你可以把信道理解为&lt;strong&gt;WiFi的&amp;quot;车道&amp;quot;&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;我们的WiFi设备需要在某个频率上工作，就像汽车需要在公路上行驶一样。&lt;strong&gt;2.4G频段&lt;/strong&gt;的频率范围是2400MHz~2483MHz，把这段频率切成多个&amp;quot;车道&amp;quot;，每个&amp;quot;车道&amp;quot;就是一个信道。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;2.4G频段的关键知识：&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;信道宽度约20MHz&lt;/li&gt;&#xA;&lt;li&gt;相邻信道会重叠干扰（就像相邻车道会蹭到）&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;只有1、6、11这三个信道是不重叠的&lt;/strong&gt;——这是铁律！&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2.4G信道分布示意：&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;信道:  1    2    3    4    5    6    7    8    9   10   11&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      |====|====|====|====|====|====|====|====|====|====|====|&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      |_______________________|&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;              信道 1 (中心频率 2412MHz)&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                |_______________________|&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        信道 6 (中心频率 2437MHz)&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                          |_______________________|&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                                  信道 11 (中心频率 2462MHz)&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;说明：只有 1、6、11 三个信道完全不重叠，其他信道都会相互干扰&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;5G频段&lt;/strong&gt;就没有这个问题。5G的可用信道多得多，而且相邻信道不重叠，可以放心使用。&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>欢迎来到我的博客</title>
-      <link>http://localhost:1313/posts/2026-5-26-welcome-to-my-blog/</link>
-      <pubDate>Mon, 18 May 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/2026-5-26-welcome-to-my-blog/</guid>
-      <description>&lt;p&gt;👋 你好，欢迎来到我的个人博客！&lt;/p&gt;&#xA;&lt;p&gt;这里是 &lt;strong&gt;Wanzf&amp;rsquo;s Blog&lt;/strong&gt;，一个专注于技术分享与学习记录的个人空间。&lt;/p&gt;&#xA;&lt;h2 id=&#34;-博客方向&#34;&gt;🎯 博客方向&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;🔧 &lt;strong&gt;网络技术&lt;/strong&gt; — 代理搭建、网络优化、服务器运维&lt;/li&gt;&#xA;&lt;li&gt;🤖 &lt;strong&gt;AI 自动化&lt;/strong&gt; — 工具推荐、效率提升、实践心得&lt;/li&gt;&#xA;&lt;li&gt;💻 &lt;strong&gt;脚本开发&lt;/strong&gt; — 实用脚本、自动化方案&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;-关于我&#34;&gt;📝 关于我&lt;/h2&gt;&#xA;&lt;p&gt;一个对技术充满热情的学习者，相信「分享是最好的学习方式」。在这里记录自己的技术探索和成长历程，希望能帮到有同样兴趣的你。&lt;/p&gt;&#xA;&lt;h2 id=&#34;-交流&#34;&gt;🤝 交流&lt;/h2&gt;&#xA;&lt;p&gt;如果你对文章内容有疑问，或者想交流技术，欢迎：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;在文章下方留言评论&lt;/li&gt;&#xA;&lt;li&gt;通过社交图标联系我&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;感谢访问，一起进步！🚀&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>About Wanzf</title>
-      <link>http://localhost:1313/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/about/</guid>
-      <description>关于我</description>
-    </item>
-    <item>
-      <title>归档 ⏱️</title>
-      <link>http://localhost:1313/archives/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/archives/</guid>
-      <description>按时间整理的所有文章</description>
-    </item>
-    <item>
-      <title>搜索</title>
-      <link>http://localhost:1313/search/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/search/</guid>
-      <description>搜索文章</description>
     </item>
   </channel>
 </rss>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>随笔 on Wanzf&#39;s Blog</title>
-    <link>http://localhost:1313/tags/%E9%9A%8F%E7%AC%94/</link>
-    <description>Recent content in 随笔 on Wanzf&#39;s Blog</description>
+    <title>博客 on Wanzf&#39;s Blog</title>
+    <link>http://localhost:1313/tags/%E5%8D%9A%E5%AE%A2/</link>
+    <description>Recent content in 博客 on Wanzf&#39;s Blog</description>
     <generator>Hugo</generator>
     <language>zh</language>
     <lastBuildDate>Mon, 18 May 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/%E9%9A%8F%E7%AC%94/index.xml" rel="self" type="application/rss" />
+    <atom:link href="http://localhost:1313/tags/%E5%8D%9A%E5%AE%A2/index.xml" rel="self" type="application/rss" />
     <item>
       <title>欢迎来到我的博客</title>
       <link>http://localhost:1313/posts/2026-5-26-welcome-to-my-blog/</link>
