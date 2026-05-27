@@ -6,7 +6,7 @@ description: "介绍 Charles Kay Ogden 在 1930 年提出的 Basic English 体�
 tags: ["英语学习", "词汇", "Basic English", "Ogden", "工具"]
 categories: ["英语学习"]
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ShowReadingTime: true
 ---
 
