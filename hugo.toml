@@ -100,22 +100,6 @@ enableInlineShortcodes = true
     Content = """
 📖 **[基础英语词汇](/vocabulary/)** —— 基于 Ogden's Basic English 体系的 850 核心词汇学习工具。支持分类浏览、背诵模式、学习进度追踪。
 > 💡 更多项目持续添加中...
-
-<div class="newsletter-box">
-  <div class="newsletter-title">📬 邮件订阅</div>
-  <div class="newsletter-desc">新文章第一时间送达邮箱，无需手动刷新。</div>
-  <form
-    action="https://buttondown.com/api/emails/embed-subscribe/wanzf"
-    method="post"
-    onsubmit="window.open('https://buttondown.com/wanzf', 'popupwindow')"
-    target="popupwindow"
-    class="newsletter-form"
-  >
-    <input type="email" name="email" placeholder="your@email.com" required class="newsletter-input" />
-    <input type="hidden" value="1" name="embed" />
-    <button type="submit" class="newsletter-btn">订阅</button>
-  </form>
-</div>
 """
 
   
