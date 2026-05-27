@@ -24,7 +24,76 @@
     max-width: 100% !important;
 }
 
-/* ---- 代码块美化 ---- */
+/* ---- 邮件订阅样式 ---- */
+.newsletter-box {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--entry);
+}
+
+.newsletter-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.newsletter-desc {
+    font-size: 0.9em;
+    color: var(--secondary);
+    margin-bottom: 14px;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 8px;
+}
+
+.newsletter-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--code-bg);
+    color: var(--primary);
+    font-size: 0.9em;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.newsletter-input:focus {
+    border-color: var(--accent);
+}
+
+.newsletter-input::placeholder {
+    color: var(--secondary);
+}
+
+.newsletter-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--entry);
+    font-weight: 600;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.newsletter-btn:hover {
+    opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+    .newsletter-form {
+        flex-direction: column;
+    }
+}
+
+/* 代码块美化 ---- */
 .highlight {
     position: relative;
 }
