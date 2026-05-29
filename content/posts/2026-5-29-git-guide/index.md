@@ -10,35 +10,8 @@ ShowToc: true
 TocOpen: false
 ---
 
-# Git 完全指南：Hugo 博客开发者的版本控制手册
-
 > 适用项目：GitHub 博客项目（https://github.com/wanzif/MyBlog.git）
 > 适用系统：Windows 11 / Linux（CentOS 7、Ubuntu 等）
-
----
-
-## 目录
-
-1. [Windows 安装 Git](#1-windows-安装-git)
-2. [Linux 安装 Git](#2-linux-安装-git)
-3. [Git 初始配置](#3-git-初始配置)
-4. [克隆 GitHub 项目到本地](#4-克隆-github-项目到本地)
-5. [推送前本地测试（Hugo 预览）](#5-推送前本地测试hugo-预览)
-6. [日常操作：修改、提交、推送](#6-日常操作修改提交推送)
-7. [分支操作](#7-分支操作)
-8. [冲突解决](#8-冲突解决)
-9. [.gitignore 文件](#9-gitignore-文件)
-10. [Git Stash（暂存工作区）](#10-git-stash暂存工作区)
-11. [子模块（Submodule）管理](#11-子模块submodule管理)
-12. [Git 别名与效率提升](#12-git-别名与效率提升)
-13. [撤回操作大全](#13-撤回操作大全)
-14. [常见报错与解决方案](#14-常见报错与解决方案)
-15. [Git Tag（标签/版本标记）](#15-git-tag标签版本标记)
-16. [多设备协作（家里 + 学校同步开发）](#16-多设备协作家里--学校同步开发)
-17. [GitHub Pull Request](#17-github-pull-request)
-18. [Git Clean（清理工作区）](#18-git-clean清理工作区)
-19. [Git Bisect（二分法定位问题）](#19-git-bisect二分法定位问题)
-20. [速查表](#20-速查表)
 
 ---
 
