@@ -3,13 +3,12 @@ title: "从零搭建个人博客：Hugo + Cloudflare Pages 全流程实录"
 date: 2026-05-30T21:34:30+08:00
 tags: ["Hugo", "Cloudflare", "博客搭建"]
 categories: ["教程"]
+ShowToc: true
 TocOpen: false
 draft: false
 ---
 > 从注册账号到绑定域名、部署上线、配置图床，手把手带你用 Hugo + Cloudflare Pages + R2 搭建一个零成本、国内可访问的个人博客。每一步都附带预期输出和踩坑记录。
 
-> **最后更新：2026-05-30**
->
 > **配套阅读**：遇到 Git 相关报错，请参阅《Git 完全指南：Hugo 博客开发者的版本控制手册》
 
 ---
