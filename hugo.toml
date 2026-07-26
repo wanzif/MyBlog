@@ -98,7 +98,7 @@ enableInlineShortcodes = true
   [params.homeInfoParams]
     Title = "优秀项目 🚀"
     Content = """
-📖 **[基础英语词汇](/vocabulary/)** —— 基于 Ogden's Basic English 体系的 850 核心词汇学习工具。支持分类浏览、背诵模式、学习进度追踪。
+📖 **[基础英语词汇](/vocabulary/)** —— 基于 Ogden's Basic English 体系的 850 核心词汇学习工具。支持分类浏览、背诵模式、学习进度追踪。<br>
 🖥️ **[AI 资讯聚合](https://ai.wanzf.com)** —— 零成本自动资讯站。每天抓取中英文科技资讯，英文自动翻译成中文摘要，打开网页就能看。Cloudflare Workers 全栈实战项目。
 > 💡 更多项目持续添加中...
 """
