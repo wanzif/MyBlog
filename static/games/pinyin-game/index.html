@@ -581,6 +581,41 @@ function speak(text, rate){
   }catch(e){}
 }
 
+/* ---------------- 真人发音音频（标准普通话，替代 TTS 发音标） ---------------- */
+const AUDIO_MAP = {
+  // 声母呼读音（b→bo、d→de、zh→zhi…）
+  b:'bo1', p:'po1', m:'mo1', f:'fo1', d:'de1', t:'te1', n:'ne1', l:'le1',
+  g:'ge1', k:'ke1', h:'he1', j:'ji1', q:'qi1', x:'xi1',
+  zh:'zhi1', ch:'chi1', sh:'shi1', r:'ri1', z:'zi1', c:'ci1', s:'si1', y:'yi1', w:'wu1',
+  // 单韵母
+  a:'a1', o:'o1', e:'e1', i:'yi1', u:'wu1', ü:'yu1',
+  // 复韵母
+  ai:'ai1', ei:'ei1', ui:'wei1', ao:'ao1', ou:'ou1', iu:'you1', ie:'ye1', üe:'yue1', er:'er1',
+  // 鼻韵母
+  an:'an1', en:'en1', in:'yin1', un:'wen1', ün:'yun1', ang:'ang1', eng:'eng1', ing:'ying1', ong:'ong1',
+  // 整体认读音节
+  zhi:'zhi1', chi:'chi1', shi:'shi1', ri:'ri1', zi:'zi1', ci:'ci1', si:'si1',
+  yi:'yi1', wu:'wu1', yu:'yu1', ye:'ye1', yue:'yue1', yuan:'yuan1', yin:'yin1', yun:'yun1', ying:'ying1',
+  // 拼读音节（带声调）
+  bā:'ba1', bō:'bo1', bái:'bai2', pá:'pa2', mā:'ma1', mō:'mo1', mǐ:'mi3', méi:'mei2',
+  fā:'fa1', dà:'da4', tā:'ta1', ná:'na2', niú:'niu2', lā:'la1', lí:'li2', lǎo:'lao3',
+  gē:'ge1', guī:'gui1', kē:'ke1', hé:'he2', hǎo:'hao3', jī:'ji1', qī:'qi1', xī:'xi1',
+  // 声调（四声）
+  má:'ma2', mǎ:'ma3', mà:'ma4', bá:'ba2', bǎ:'ba3', bà:'ba4',
+  dā:'da1', dá:'da2', dǎ:'da3', mī:'mi1', mí:'mi2', mì:'mi4',
+  gé:'ge2', gě:'ge3', gè:'ge4', wō:'wo1', wó:'wo2', wǒ:'wo3', wò:'wo4',
+  yī:'yi1', yí:'yi2', yǐ:'yi3', yì:'yi4', hē:'he1', hě:'he3', hè:'he4',
+  shī:'shi1', shí:'shi2', shǐ:'shi3', shì:'shi4', lá:'la2', lǎ:'la3', là:'la4'
+};
+const audioCache = {};
+function playAudio(key){
+  const f = AUDIO_MAP[key];
+  if(!f) return;
+  if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3');
+  const a = audioCache[f];
+  try{ a.currentTime = 0; a.play(); }catch(e){}
+}
+
 /* ---------------- 音效（Web Audio） ---------------- */
 let AC = null;
 function ac(){
@@ -722,13 +757,13 @@ function openModal(it){
   $('modalWord').textContent=it.word;
   $('modalRead').textContent='读作：'+it.read+'（'+it.label+'）';
   $('modal').classList.remove('hidden');
-  speak(it.read);
+  playAudio(it.label);
   setTimeout(()=>speak(it.word), 700);
 }
 function replayModal(){
   const it = currentModalItem || null;
   if(!it) return;
-  speak(it.read); setTimeout(()=>speak(it.word), 650);
+  playAudio(it.label); setTimeout(()=>speak(it.word), 650);
 }
 let currentModalItem = null;
 // 包装 openModal 记录当前项
@@ -876,7 +911,7 @@ function checkSpell(){
 function onSpellCorrect(){
   spellState.locked=true;
   sfxCorrect(); starBurst(); feedback('真棒！'+spellState.combo.word+' 👍', true);
-  speak(spellState.combo.read);
+  playAudio(spellState.combo.syl);
   addStars(1);
   spellCorrect++;
   setTimeout(()=>{
@@ -922,15 +957,15 @@ function nextTone(){
     b.onclick=()=>answerTone(t, idx, b);
     g.appendChild(b);
   });
-  setTimeout(()=>speak(t.read), 400);
+  setTimeout(()=>playAudio(t.tones[t.ans]), 400);
 }
-function speakToneTarget(){ const t=TONES[(toneIdx-1) % TONES.length]; speak(t.read); }
+function speakToneTarget(){ const t=TONES[(toneIdx-1) % TONES.length]; playAudio(t.tones[t.ans]); }
 function answerTone(t, idx, btn){
   if(t.answered) return; t.answered=true;
   if(idx===t.ans){
     sfxCorrect(); addStars(1); toneCorrect++;
     feedback('对啦！'+t.word+' 👍', true);
-    speak(t.read);
+    playAudio(t.tones[t.ans]);
     playTrain();
     setTimeout(()=>{ t.answered=false; if(toneCorrect>0&&toneCorrect%5===0){ $('celTitle').textContent='🚂 声调小火车过关啦！'; $('celSub').textContent='你已答对 '+toneCorrect+' 个声调！'; showCelebrate(); } nextTone(); }, 2400);
   }else{
@@ -966,15 +1001,15 @@ function nextListen(){
     b.onclick=()=>answerListen(q, op, b);
     c.appendChild(b);
   });
-  setTimeout(()=>speak(q.read), 400);
+  setTimeout(()=>playAudio(q.ans), 400);
 }
-function speakListenTarget(){ const q=LISTEN[(listenIdx-1)%LISTEN.length]; speak(q.read); }
+function speakListenTarget(){ const q=LISTEN[(listenIdx-1)%LISTEN.length]; playAudio(q.ans); }
 function answerListen(q, op, btn){
   if(q.answered) return; q.answered=true;
   if(op===q.ans){
     sfxCorrect(); starBurst(); addStars(1); listenCorrect++;
     feedback('找到啦！就是 "'+q.ans+'" 👍', true);
-    speak(q.read);
+    playAudio(q.ans);
     setTimeout(()=>{ q.answered=false; if(listenCorrect>0&&listenCorrect%5===0){ $('celTitle').textContent='👂 听音找朋友过关啦！'; $('celSub').textContent='你的小耳朵真灵！答对 '+listenCorrect+' 题！'; showCelebrate(); } nextListen(); }, 1300);
   }else{
     sfxWrong(); btn.classList.add('wrong-flash');
