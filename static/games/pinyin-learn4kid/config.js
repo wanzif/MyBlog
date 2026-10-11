@@ -35,8 +35,8 @@ window.GameConfig = {
   // ========================
   pinyinToAudioMap: {
     // 单韵母
-    //"a": "assets/audio/a0.mp3",
-    //"ā": "assets/audio/a1.mp3",
+    "a": "assets/audio/a0.mp3",
+    "ā": "assets/audio/a1.mp3",
     "á": "assets/audio/a2.mp3",
     "ǎ": "assets/audio/a3.mp3",
     "à": "assets/audio/a4.mp3",
@@ -53,7 +53,7 @@ window.GameConfig = {
     "ě": "assets/audio/e3.mp3",
     "è": "assets/audio/e4.mp3",
 
-    /*"i": "assets/audio/i0.mp3",
+    "i": "assets/audio/i0.mp3",
     "ī": "assets/audio/i1.mp3",
     "í": "assets/audio/i2.mp3",
     "ǐ": "assets/audio/i3.mp3",
@@ -69,39 +69,39 @@ window.GameConfig = {
     "ǖ": "assets/audio/yu1.mp3",
     "ǘ": "assets/audio/yu2.mp3",
     "ǚ": "assets/audio/yu3.mp3",
-    "ǜ": "assets/audio/yu4.mp3",*/
+    "ǜ": "assets/audio/yu4.mp3",
 
     // 声母
-    //"b": "assets/audio/b.mp3",
-    //"p": "assets/audio/p.mp3",
-    //"m": "assets/audio/m.mp3",
-    //"f": "assets/audio/f.mp3",
+    "b": "assets/audio/b.mp3",
+    "p": "assets/audio/p.mp3",
+    "m": "assets/audio/m.mp3",
+    "f": "assets/audio/f.mp3",
     "d": "assets/audio/d.mp3",
     "t": "assets/audio/t.mp3",
     "n": "assets/audio/n.mp3",
     "l": "assets/audio/l.mp3",
-    //"g": "assets/audio/g.mp3",
-    //"k": "assets/audio/k.mp3",
-    //"h": "assets/audio/h.mp3",
-    //"j": "assets/audio/j.mp3",
-    //"q": "assets/audio/q.mp3",
-    //"x": "assets/audio/x.mp3",
-    //"z": "assets/audio/z.mp3",
+    "g": "assets/audio/g.mp3",
+    "k": "assets/audio/k.mp3",
+    "h": "assets/audio/h.mp3",
+    "j": "assets/audio/j.mp3",
+    "q": "assets/audio/q.mp3",
+    "x": "assets/audio/x.mp3",
+    "z": "assets/audio/z.mp3",
     "c": "assets/audio/c.mp3",
-    //"s": "assets/audio/s.mp3",
+    "s": "assets/audio/s.mp3",
     "r": "assets/audio/r.mp3",
-    //"zh": "assets/audio/zh.mp3",
-    //"ch": "assets/audio/ch.mp3",
-    //"sh": "assets/audio/sh.mp3",
-    //"y": "assets/audio/y.mp3",
-    //"w": "assets/audio/w.mp3",
+    "zh": "assets/audio/zh.mp3",
+    "ch": "assets/audio/ch.mp3",
+    "sh": "assets/audio/sh.mp3",
+    "y": "assets/audio/y.mp3",
+    "w": "assets/audio/w.mp3",
 
     // 复韵母
-    /*"ai": "assets/audio/ai0.mp3",
+    "ai": "assets/audio/ai0.mp3",
     "āi": "assets/audio/ai1.mp3",
     "ái": "assets/audio/ai2.mp3",
     "ǎi": "assets/audio/ai3.mp3",
-    "ài": "assets/audio/ai4.mp3",*/
+    "ài": "assets/audio/ai4.mp3",
 
     "ei": "assets/audio/ei0.mp3",
     "ēi": "assets/audio/ei1.mp3",
@@ -109,23 +109,23 @@ window.GameConfig = {
     "ěi": "assets/audio/ei3.mp3",
     "èi": "assets/audio/ei4.mp3",
 
-    /*"ui": "assets/audio/ui0.mp3",
+    "ui": "assets/audio/ui0.mp3",
     "uī": "assets/audio/ui1.mp3",
     "uí": "assets/audio/ui2.mp3",
     "uǐ": "assets/audio/ui3.mp3",
-    "uì": "assets/audio/ui4.mp3",*/
+    "uì": "assets/audio/ui4.mp3",
 
     "ao": "assets/audio/ao0.mp3",
     "āo": "assets/audio/ao1.mp3",
-    //"áo": "assets/audio/ao2.mp3",
+    "áo": "assets/audio/ao2.mp3",
     "ǎo": "assets/audio/ao3.mp3",
     "ào": "assets/audio/ao4.mp3",
 
-    /*"ou": "assets/audio/ou0.mp3",
+    "ou": "assets/audio/ou0.mp3",
     "ōu": "assets/audio/ou1.mp3",
     "óu": "assets/audio/ou2.mp3",
     "ǒu": "assets/audio/ou3.mp3",
-    "òu": "assets/audio/ou4.mp3",*/
+    "òu": "assets/audio/ou4.mp3",
 
     "iu": "assets/audio/iu0.mp3",
     "iū": "assets/audio/iu1.mp3",
@@ -133,53 +133,53 @@ window.GameConfig = {
     "iǔ": "assets/audio/iu3.mp3",
     "iù": "assets/audio/iu4.mp3",
 
-    /*"ie": "assets/audio/ie0.mp3",
+    "ie": "assets/audio/ie0.mp3",
     "iē": "assets/audio/ie1.mp3",
     "ié": "assets/audio/ie2.mp3",
     "iě": "assets/audio/ie3.mp3",
-    "iè": "assets/audio/ie4.mp3",*/
+    "iè": "assets/audio/ie4.mp3",
 
-    /*"üe": "assets/audio/yue0.mp3",
+    "üe": "assets/audio/yue0.mp3",
     "ǖe": "assets/audio/yue1.mp3",
     "ǘe": "assets/audio/yue2.mp3",
     "ǚe": "assets/audio/yue3.mp3",
-    "ǜe": "assets/audio/yue4.mp3",*/
+    "ǜe": "assets/audio/yue4.mp3",
 
     "er": "assets/audio/er0.mp3",
-    //"ēr": "assets/audio/er1.mp3",
+    "ēr": "assets/audio/er1.mp3",
     "ér": "assets/audio/er2.mp3",
     "ěr": "assets/audio/er3.mp3",
     "èr": "assets/audio/er4.mp3",
 
-    /*"an": "assets/audio/an0.mp3",
+    "an": "assets/audio/an0.mp3",
     "ān": "assets/audio/an1.mp3",
     "án": "assets/audio/an2.mp3",
     "ǎn": "assets/audio/an3.mp3",
-    "àn": "assets/audio/an4.mp3",*/
+    "àn": "assets/audio/an4.mp3",
 
-    /*"en": "assets/audio/en0.mp3",
+    "en": "assets/audio/en0.mp3",
     "ēn": "assets/audio/en1.mp3",
     "én": "assets/audio/en2.mp3",
     "ěn": "assets/audio/en3.mp3",
-    "èn": "assets/audio/en4.mp3",*/
+    "èn": "assets/audio/en4.mp3",
 
-    /*"in": "assets/audio/in0.mp3",
+    "in": "assets/audio/in0.mp3",
     "īn": "assets/audio/in1.mp3",
     "ín": "assets/audio/in2.mp3",
     "ǐn": "assets/audio/in3.mp3",
-    "ìn": "assets/audio/in4.mp3",*/
+    "ìn": "assets/audio/in4.mp3",
 
-    /*"un": "assets/audio/un0.mp3",
+    "un": "assets/audio/un0.mp3",
     "ūn": "assets/audio/un1.mp3",
     "ún": "assets/audio/un2.mp3",
     "ǔn": "assets/audio/un3.mp3",
-    "ùn": "assets/audio/un4.mp3",*/
+    "ùn": "assets/audio/un4.mp3",
 
-    /*"ün": "assets/audio/yun0.mp3",
+    "ün": "assets/audio/yun0.mp3",
     "ǖn": "assets/audio/yun1.mp3",
     "ǘn": "assets/audio/yun2.mp3",
     "ǚn": "assets/audio/yun3.mp3",
-    "ǜn": "assets/audio/yun4.mp3",*/
+    "ǜn": "assets/audio/yun4.mp3",
 
     "ang": "assets/audio/ang0.mp3",
     "āng": "assets/audio/ang1.mp3",
@@ -187,17 +187,17 @@ window.GameConfig = {
     "ǎng": "assets/audio/ang3.mp3",
     "àng": "assets/audio/ang4.mp3",
 
-    /*"eng": "assets/audio/eng0.mp3",
+    "eng": "assets/audio/eng0.mp3",
     "ēng": "assets/audio/eng1.mp3",
     "éng": "assets/audio/eng2.mp3",
     "ěng": "assets/audio/eng3.mp3",
-    "èng": "assets/audio/eng4.mp3",*/
+    "èng": "assets/audio/eng4.mp3",
 
-    /*"ing": "assets/audio/ing0.mp3",
+    "ing": "assets/audio/ing0.mp3",
     "īng": "assets/audio/ing1.mp3",
     "íng": "assets/audio/ing2.mp3",
     "ǐng": "assets/audio/ing3.mp3",
-    "ìng": "assets/audio/ing4.mp3",*/
+    "ìng": "assets/audio/ing4.mp3",
 
     "ong": "assets/audio/ong0.mp3",
     "ōng": "assets/audio/ong1.mp3",
@@ -206,7 +206,7 @@ window.GameConfig = {
     "òng": "assets/audio/ong4.mp3",
 
     // 整体认读音节
-    /*"zhi": "assets/audio/zhi0.mp3",
+    "zhi": "assets/audio/zhi0.mp3",
     "zhī": "assets/audio/zhi1.mp3",
     "zhí": "assets/audio/zhi2.mp3",
     "zhǐ": "assets/audio/zhi3.mp3",
@@ -222,10 +222,10 @@ window.GameConfig = {
     "shī": "assets/audio/shi1.mp3",
     "shí": "assets/audio/shi2.mp3",
     "shǐ": "assets/audio/shi3.mp3",
-    "shì": "assets/audio/shi4.mp3",*/
+    "shì": "assets/audio/shi4.mp3",
 
-    "ri": "assets/audio/ri0.mp3"
-    /*"rī": "assets/audio/ri1.mp3",
+    "ri": "assets/audio/ri0.mp3",
+    "rī": "assets/audio/ri1.mp3",
     "rí": "assets/audio/ri2.mp3",
     "rǐ": "assets/audio/ri3.mp3",
     "rì": "assets/audio/ri4.mp3",
@@ -300,7 +300,7 @@ window.GameConfig = {
     "yīng": "assets/audio/ying1.mp3",
     "yíng": "assets/audio/ying2.mp3",
     "yǐng": "assets/audio/ying3.mp3",
-    "yìng": "assets/audio/ying4.mp3"*/
+    "yìng": "assets/audio/ying4.mp3"
   },
 
   // ========================
