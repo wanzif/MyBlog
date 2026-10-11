@@ -765,12 +765,12 @@ function openModal(it){
   $('modalWord').textContent=it.word;
   $('modalRead').textContent='读作：'+it.read+'（'+it.label+'）';
   $('modal').classList.remove('hidden');
-  playAudio(it.label, () => setTimeout(() => speak(it.word), 900));
+  playAudio(it.label, () => setTimeout(() => speak(it.word), 700));
 }
 function replayModal(){
   const it = currentModalItem || null;
   if(!it) return;
-  playAudio(it.label, () => setTimeout(() => speak(it.word), 900));
+  playAudio(it.label, () => setTimeout(() => speak(it.word), 700));
 }
 let currentModalItem = null;
 // 包装 openModal 记录当前项
