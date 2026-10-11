@@ -40,6 +40,11 @@ enableInlineShortcodes = true
 #  weight = 1                            # 排序权重（数字越小越靠前）
 
 [[menu.main]]
+  name = "游戏 🎮"
+  url = "/games/"
+  weight = 10
+
+[[menu.main]]
   name = "归档 ⏱️"
   url = "/archives/"
   weight = 20
@@ -99,6 +104,8 @@ enableInlineShortcodes = true
     Title = "优秀项目 🚀"
     Content = """
 📖 **[基础英语词汇](/vocabulary/)** —— 基于 Ogden's Basic English 体系的 850 核心词汇学习工具。支持分类浏览、背诵模式、学习进度追踪。<br>
+🎮 **[拼音乐园](/games/pinyin-game/)** —— 一年级拼音课堂演示游戏，点读、拼读、声调、听音四大玩法，大屏一体机也能玩。<br>
+🎮 **[拼音闯关 H5](/games/pinyin-learn4kid/)** —— 幼小衔接拼音单机闯关游戏，关卡晋级制，手机、电脑都能玩。<br>
 🖥️ **[AI 资讯聚合](https://ai.wanzf.com)** —— 零成本自动资讯站。每天抓取中英文科技资讯，英文自动翻译成中文摘要，打开网页就能看。Cloudflare Workers 全栈实战项目。
 > 💡 更多项目持续添加中...
 """

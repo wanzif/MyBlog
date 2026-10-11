@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拼音大冒险 - 幼小衔接快乐练</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide 图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans CJK SC", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* 针对手机端滚动条的优化 */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-blue-50 to-indigo-100 min-h-screen flex flex-col select-none overflow-x-hidden">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm px-4 py-3 flex justify-between items-center sticky top-0 z-10">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🎒</span>
+            <h1 class="text-xl font-bold text-indigo-600">拼音大冒险</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-1 bg-yellow-100 px-3 py-1 rounded-full text-yellow-700 font-bold">
+                <span>⭐</span>
+                <span id="score-display">0</span>
+            </div>
+            <button id="home-btn" class="text-gray-500 hover:text-indigo-600 focus:outline-none hidden">
+                <i data-lucide="home" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 游戏主容器 -->
+    <main class="flex-1 max-w-md w-full mx-auto p-4 flex flex-col justify-between">
+        
+        <!-- 关卡选择界面 -->
+        <section id="level-select" class="space-y-4 my-auto">
+            <h2 class="text-center text-lg font-bold text-gray-700 mb-6">请选择挑战关卡：</h2>
+            <div id="level-buttons" class="space-y-3">
+                <!-- 动态生成关卡按钮 -->
+            </div>
+        </section>
+
+        <!-- 复习总表界面 -->
+        <section id="review-mode" class="hidden flex-1 flex-col space-y-6 overflow-y-auto custom-scrollbar pb-8">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-black text-indigo-600">拼音总表</h2>
+                <p class="text-sm text-gray-400">点击卡片听读音，温故而知新</p>
+            </div>
+            <div id="review-container" class="space-y-6">
+                <!-- 动态生成分组内容 -->
+            </div>
+        </section>
+
+        <!-- 游戏答题界面 -->
+        <section id="game-play" class="hidden flex-1 flex-col justify-between space-y-4">
+            <!-- 进度条与生命值 -->
+            <div class="flex justify-between items-center text-sm text-gray-500">
+                <span id="progress-text">第 1 / 10 题</span>
+                <div class="flex space-x-1" id="hearts-container">
+                    <!-- 动态生命值红心 -->
+                </div>
+            </div>
+
+            <!-- 题目展示区 -->
+            <div class="bg-white rounded-3xl p-6 shadow-md border-4 border-indigo-100 flex flex-col items-center justify-center min-h-[200px] relative">
+                <!-- 声音播放按钮 -->
+                <button id="sound-btn" class="absolute top-4 right-4 bg-indigo-100 hover:bg-indigo-200 p-3 rounded-full text-indigo-600 transition-transform active:scale-95">
+                    <i data-lucide="volume-2" class="w-6 h-6"></i>
+                </button>
+
+                <!-- 核心展示内容 -->
+                <div id="question-display-area" class="text-center space-y-4 w-full">
+                    <!-- 动态渲染：图片、汉字或拼音占位符 -->
+                </div>
+            </div>
+
+            <!-- 操作/选择区 -->
+            <div class="space-y-4">
+                <p id="instruction-text" class="text-center text-sm font-medium text-gray-500">请选择正确的答案：</p>
+                
+                <!-- 选项容器（适用于选择题） -->
+                <div id="options-container" class="grid grid-cols-2 gap-3">
+                    <!-- 动态生成选项按钮 -->
+                </div>
+
+                <!-- 键盘拼读区（适用于关卡 5 逆向拆解，选项卡切换布局） -->
+                <div id="keyboard-container" class="hidden space-y-3">
+                    <!-- 选项卡按钮 -->
+                    <div class="flex space-x-1 p-1 bg-gray-100 rounded-xl">
+                        <button onclick="switchTab('sm')" id="tab-sm" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-indigo-600 transition-all">声母</button>
+                        <button onclick="switchTab('dy')" id="tab-dy" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 hover:bg-white/50 transition-all">单韵母</button>
+                        <button onclick="switchTab('fy')" id="tab-fy" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 hover:bg-white/50 transition-all">复韵母</button>
+                    </div>
+
+                    <!-- 键盘区域 -->
+                    <div id="keyboard-content" class="min-h-[160px]">
+                        <div id="sm-keyboard" class="flex flex-wrap gap-1.5 justify-center p-1">
+                            <!-- 动态生成 -->
+                        </div>
+                        <div id="dy-keyboard" class="hidden flex flex-wrap gap-1.5 justify-center p-1">
+                            <!-- 动态生成 -->
+                        </div>
+                        <div id="fy-keyboard" class="hidden flex flex-wrap gap-1.5 justify-center p-1">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 控制按钮 -->
+                    <div class="flex space-x-2 pt-2">
+                        <button id="clear-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-2xl font-bold transition-colors active:scale-95">清除</button>
+                        <button id="submit-btn" class="flex-2 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-8 rounded-2xl font-bold transition-colors active:scale-95">确定</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关卡结算界面 -->
+        <section id="game-over" class="hidden text-center space-y-6 my-auto">
+            <div class="text-6xl animate-bounce">🏆</div>
+            <h2 class="text-2xl font-bold text-gray-800">关卡完成！</h2>
+            <p class="text-gray-600">你太棒了！拼音能力又提升了！</p>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 inline-block px-8">
+                <span class="text-gray-500">本次得分</span>
+                <div class="text-3xl font-black text-yellow-500" id="final-score">0</div>
+            </div>
+            <button id="retry-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 transition-all active:scale-95">
+                继续挑战其他关卡
+            </button>
+        </section>
+    </main>
+
+    <!-- 1. 引入外部配置文件 -->
+    <script src="config.js"></script>
+
+    <!-- 2. 核心游戏逻辑 -->
+    <script>
+        // 检查 GameConfig 是否成功加载
+        if (!window.GameConfig) {
+            alert("未检测到 config.js 文件，请确保它与 index.html 放在同一目录下！");
+        }
+
+        const GameConfig = window.GameConfig;
+
+        // 游戏运行状态变量
+        let currentLevel = null;
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let lives = 3;
+        let selectedShengmu = "";
+        let selectedYunmu = "";
+        let levelScore = 0;
+
+        // 声母和韵母键盘列表（用于第5关）
+        const shengmuList = GameConfig.reviewData.find(d => d.title === "声母").items;
+        const danYunmuList = ['ā', 'á', 'ǎ', 'à', 'ō', 'ó', 'ǒ', 'ò', 'ē', 'é', 'ě', 'è', 'ī', 'í', 'ǐ', 'ì', 'ū', 'ú', 'ǔ', 'ù', 'ǖ', 'ǘ', 'ǚ', 'ǜ'];
+        const fuYunmuList = [
+            'āi', 'ái', 'ǎi', 'ài', 'ēi', 'éi', 'ěi', 'èi', 'uī', 'uí', 'uǐ', 'uì', 
+            'āo', 'áo', 'ǎo', 'ào', 'ōu', 'óu', 'ǒu', 'òu', 'iū', 'iú', 'iǔ', 'iù', 
+            'iē', 'ié', 'iě', 'iè', 'üē', 'üé', 'üě', 'üè', 'ēr', 'ér', 'ěr', 'èr',
+            'ān', 'án', 'ǎn', 'àn', 'ēn', 'én', 'ěn', 'èn', 'īn', 'ín', 'ǐn', 'ìn', 
+            'ūn', 'ún', 'ǔn', 'ùn', 'ǖn', 'ǘn', 'ǚn', 'ǜn',
+            'āng', 'áng', 'ǎng', 'àng', 'ēng', 'éng', 'ěng', 'èng', 'īng', 'íng', 'ǐng', 'ìng', 'ōng', 'óng', 'ǒng', 'òng'
+        ];
+        const zhengtiList = GameConfig.reviewData.find(d => d.title === "整体认读音节").items;
+
+        // 语音朗读 (TTS 兜底)
+        function speak(text) {
+            if (!text || !('speechSynthesis' in window)) return;
+
+            // 统一转换逻辑：如果输入的是拼音音节，则去 pinyinToHanziMap 找对应的汉字
+            // 比如输入 'e'，转换成 '呃' 再朗读，防止浏览器直接读英文字母
+            const normalizedText = text.trim().normalize('NFC');
+            const hanzis = GameConfig.pinyinToHanziMap || {};
+            const ttsText = hanzis[normalizedText] || normalizedText;
+
+            console.log(`[TTS] 原始输入: "${text}", 最终朗读内容: "${ttsText}"`);
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(ttsText);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.8;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // 统一音频播放逻辑：优先查找映射表素材，没有则回退到 TTS
+        function playAudio(pinyin, fallbackText) {
+            if (!pinyin) return;
+            const normalizedPinyin = pinyin.trim().normalize('NFC');
+            
+            // 1. 尝试从映射表中获取外部素材路径
+            const audioSrc = GameConfig.pinyinToAudioMap && GameConfig.pinyinToAudioMap[normalizedPinyin];
+            
+            if (audioSrc) {
+                // 使用绝对路径解析，确保在 GitHub Pages 子目录下也能准确定位
+                const fullUrl = new URL(audioSrc, window.location.href).href;
+                console.log(`[Audio] 尝试播放素材: ${normalizedPinyin} -> ${fullUrl}`);
+                
+                const audio = new Audio(fullUrl);
+                
+                // 监听加载错误（如 404）
+                audio.onerror = () => {
+                    console.warn(`[Audio] 素材加载失败: ${fullUrl}，回退到 TTS`);
+                    speak(fallbackText || normalizedPinyin);
+                };
+
+                audio.play().catch(err => {
+                    console.warn("[Audio] 播放被拦截或失败，回退到 TTS:", err);
+                    speak(fallbackText || normalizedPinyin);
+                });
+            } else {
+                // 2. 映射表没有，直接用 TTS
+                speak(fallbackText || normalizedPinyin);
+            }
+        }
+
+        // 播放当前题目声音
+        function playCurrentSound() {
+            const q = currentQuestions[currentQuestionIndex];
+            if (!q) return;
+
+            if (currentLevel === 1) {
+                // 第一关 sound 是拼音，fallback 使用映射的汉字
+                const hanzi = GameConfig.pinyinToHanziMap[q.sound] || q.sound;
+                playAudio(q.sound, hanzi);
+            } else if (currentLevel === 2 || currentLevel === 3 || currentLevel === 5) {
+                // 关卡 2/3/5 优先用 q.pinyin 查映射表，没有则用 q.hanzi 朗读
+                playAudio(q.pinyin, q.hanzi);
+            } else if (currentLevel === 4) {
+                if (q.questionType === 'find-pinyin') {
+                    // 题目是汉字/图片，要求找拼音。朗读题目内容(汉字)
+                    // 如果有 pinyin 字段则尝试播放，没有则用 displayText
+                    const pinyin = q.pinyin || q.answer; 
+                    playAudio(pinyin, q.displayText);
+                } else {
+                    // 题目是拼音，要求找汉字。朗读题目内容(拼音)
+                    const pinyin = q.pinyin || q.displayText;
+                    playAudio(pinyin, q.answer);
+                }
+            }
+        }
+
+        // 初始化关卡选择界面
+        function initLevelSelect() {
+            const container = document.getElementById('level-buttons');
+            container.innerHTML = '';
+            
+            // 映射 Tailwind 背景色
+            const colorMap = {
+                'yellow': 'bg-yellow-400',
+                'blue': 'bg-blue-400',
+                'purple': 'bg-purple-400',
+                'pink': 'bg-pink-400',
+                'green': 'bg-green-400'
+            };
+
+            GameConfig.levelMeta.forEach(level => {
+                const bgClass = colorMap[level.color] || 'bg-indigo-400';
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center p-4 bg-white rounded-2xl shadow-sm border-2 border-transparent hover:border-indigo-300 transition-all text-left active:scale-[0.98]`;
+                btn.innerHTML = `
+                    <div class="${bgClass} text-white p-3 rounded-xl text-2xl mr-4">${level.icon}</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-base">${level.name}</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">${level.desc}</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="text-gray-300 w-5 h-5"></i>
+                `;
+                btn.onclick = () => startLevel(level.id);
+                container.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        // 开始关卡
+        function startLevel(levelId) {
+            currentLevel = levelId;
+            
+            // 隐藏所有主界面
+            document.getElementById('level-select').classList.add('hidden');
+            document.getElementById('game-play').classList.add('hidden');
+            document.getElementById('review-mode').classList.add('hidden');
+            document.getElementById('game-over').classList.add('hidden');
+            document.getElementById('home-btn').classList.remove('hidden');
+
+            if (levelId === 0) {
+                initReviewMode();
+                return;
+            }
+
+            currentQuestions = [...GameConfig[`level${levelId}Questions`]];
+            currentQuestions.sort(() => Math.random() - 0.5);
+            currentQuestionIndex = 0;
+            lives = 3;
+            levelScore = 0;
+
+            document.getElementById('game-play').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // 初始化复习模式
+        function initReviewMode() {
+            const container = document.getElementById('review-container');
+            const reviewSection = document.getElementById('review-mode');
+            container.innerHTML = '';
+            reviewSection.classList.remove('hidden');
+
+            GameConfig.reviewData.forEach(group => {
+                const groupEl = document.createElement('div');
+                groupEl.className = "space-y-3";
+                
+                const titleEl = document.createElement('h3');
+                titleEl.className = "text-sm font-bold text-gray-400 pl-2 border-l-4 border-indigo-400";
+                titleEl.innerText = group.title;
+                groupEl.appendChild(titleEl);
+
+                const gridEl = document.createElement('div');
+                gridEl.className = "grid grid-cols-4 sm:grid-cols-6 gap-2";
+                
+                group.items.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = "bg-white p-3 rounded-xl shadow-sm border border-gray-100 text-lg font-bold text-gray-700 hover:bg-indigo-50 hover:border-indigo-200 active:scale-90 transition-all";
+                    btn.innerText = item;
+                    btn.onclick = () => playAudio(item);
+                    gridEl.appendChild(btn);
+                });
+                
+                groupEl.appendChild(gridEl);
+                container.appendChild(groupEl);
+            });
+        }
+
+        // 加载题目
+        function loadQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                endLevel(true);
+                return;
+            }
+            if (lives <= 0) {
+                endLevel(false);
+                return;
+            }
+
+            document.getElementById('progress-text').innerText = `第 ${currentQuestionIndex + 1} / ${currentQuestions.length} 题`;
+            updateHearts();
+
+            const q = currentQuestions[currentQuestionIndex];
+            const displayArea = document.getElementById('question-display-area');
+            const optionsContainer = document.getElementById('options-container');
+            const keyboardContainer = document.getElementById('keyboard-container');
+            const instruction = document.getElementById('instruction-text');
+
+            optionsContainer.innerHTML = '';
+            optionsContainer.classList.remove('hidden');
+            keyboardContainer.classList.add('hidden');
+            selectedShengmu = "";
+            selectedYunmu = "";
+
+            setTimeout(playCurrentSound, 300);
+
+            if (currentLevel === 1) {
+                instruction.innerText = "听发音，选出正确的拼音卡片：";
+                displayArea.innerHTML = `<div class="text-6xl font-extrabold text-indigo-600 animate-pulse">?</div>`;
+                renderOptions(q.options, q.answer);
+            }
+            else if (currentLevel === 2) {
+                instruction.innerText = "请分别选择正确的声母和韵母：";
+                displayArea.innerHTML = `
+                    <div class="text-5xl font-bold text-gray-800 mb-2">${q.hanzi}</div>
+                    <div class="text-2xl font-bold text-indigo-600 tracking-wider">
+                        <span id="sm-slot" class="border-b-4 border-dashed border-indigo-300 px-2 min-w-[2rem] inline-block">?</span>
+                        <span class="mx-1">+</span>
+                        <span id="ym-slot" class="border-b-4 border-dashed border-indigo-300 px-2 min-w-[2rem] inline-block">?</span>
+                    </div>
+                `;
+                optionsContainer.classList.add('hidden');
+                keyboardContainer.classList.remove('hidden');
+                renderSplitKeyboard(q.shengmuOpts, q.yunmuOpts, (sm, ym) => {
+                    if (sm === q.shengmu && ym === q.yunmu) {
+                        handleCorrectAnswer();
+                    } else {
+                        handleWrongAnswer();
+                    }
+                });
+            }
+            else if (currentLevel === 3) {
+                instruction.innerText = "请点击下方拼音卡片，按顺序拼出读音：";
+                displayArea.innerHTML = `
+                    <div class="text-5xl font-bold text-gray-800 mb-2">${q.hanzi}</div>
+                    <div id="pinyin-slots" class="text-2xl font-bold text-indigo-600 min-h-[2rem] flex justify-center space-x-2"></div>
+                `;
+                renderPinyinSequenceOptions(q.candidates, q.parts);
+            }
+            else if (currentLevel === 4) {
+                instruction.innerText = "请选出正确答案：";
+                if (q.questionType === 'find-pinyin') {
+                    displayArea.innerHTML = `<div class="text-5xl font-bold text-gray-800">${q.displayText}</div>`;
+                } else {
+                    displayArea.innerHTML = `<div class="text-4xl font-bold text-indigo-600 tracking-wider">${q.displayText}</div>`;
+                }
+                renderOptions(q.options, q.answer);
+            }
+            else if (currentLevel === 5) {
+                instruction.innerText = "听汉字读音，通过拼音键盘拼出读音：";
+                displayArea.innerHTML = `
+                    <div class="text-5xl font-bold text-gray-800 mb-2">${q.hanzi}</div>
+                    <div class="text-2xl font-bold text-indigo-600 tracking-wider">
+                        <span id="sm-slot" class="border-b-4 border-dashed border-indigo-300 px-2 min-w-[2rem] inline-block">?</span>
+                        <span class="mx-1">+</span>
+                        <span id="ym-slot" class="border-b-4 border-dashed border-indigo-300 px-2 min-w-[2rem] inline-block">?</span>
+                    </div>
+                `;
+                optionsContainer.classList.add('hidden');
+                keyboardContainer.classList.remove('hidden');
+                renderFullKeyboard(q.parts);
+            }
+        }
+
+        function updateHearts() {
+            const container = document.getElementById('hearts-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const heart = document.createElement('span');
+                heart.innerHTML = i < lives ? '❤️' : '🖤';
+                container.appendChild(heart);
+            }
+        }
+
+        function renderOptions(options, correctAnswer) {
+            const container = document.getElementById('options-container');
+            
+            // 复制一份选项并进行随机乱序，防止正确答案总是在第一个
+            const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white border-2 border-gray-200 hover:border-indigo-400 text-gray-700 py-4 px-6 rounded-2xl font-bold text-lg transition-all active:scale-95 shadow-sm";
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === correctAnswer) {
+                        handleCorrectAnswer();
+                    } else {
+                        btn.className = "bg-red-100 border-2 border-red-400 text-red-700 py-4 px-6 rounded-2xl font-bold text-lg transition-all";
+                        handleWrongAnswer();
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderSplitKeyboard(smOpts, ymOpts, callback) {
+            const smContainer = document.getElementById('shengmu-keyboard');
+            const ymContainer = document.getElementById('yunmu-keyboard');
+            smContainer.innerHTML = '';
+            ymContainer.innerHTML = '';
+
+            // 随机乱序声母和韵母选项
+            const shuffledSmOpts = [...smOpts].sort(() => Math.random() - 0.5);
+            const shuffledYmOpts = [...ymOpts].sort(() => Math.random() - 0.5);
+
+            shuffledSmOpts.forEach(sm => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-2 bg-white border border-gray-200 rounded-xl font-bold text-sm hover:border-indigo-400 active:scale-90";
+                btn.innerText = sm === "" ? "无" : sm;
+                btn.onclick = () => {
+                    selectedShengmu = sm;
+                    document.getElementById('sm-slot').innerText = sm === "" ? "无" : sm;
+                    Array.from(smContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                    btn.classList.add('bg-indigo-100', 'border-indigo-400');
+                };
+                smContainer.appendChild(btn);
+            });
+
+            shuffledYmOpts.forEach(ym => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-2 bg-white border border-gray-200 rounded-xl font-bold text-sm hover:border-indigo-400 active:scale-90";
+                btn.innerText = ym;
+                btn.onclick = () => {
+                    selectedYunmu = ym;
+                    document.getElementById('ym-slot').innerText = ym;
+                    Array.from(ymContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                    btn.classList.add('bg-indigo-100', 'border-indigo-400');
+                };
+                ymContainer.appendChild(btn);
+            });
+
+            document.getElementById('submit-btn').onclick = () => {
+                if (selectedYunmu === "") {
+                    alert("请至少选择一个韵母！");
+                    return;
+                }
+                callback(selectedShengmu, selectedYunmu);
+            };
+
+            document.getElementById('clear-btn').onclick = () => {
+                selectedShengmu = "";
+                selectedYunmu = "";
+                document.getElementById('sm-slot').innerText = "?";
+                document.getElementById('ym-slot').innerText = "?";
+                Array.from(smContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                Array.from(ymContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+            };
+        }
+
+        function renderPinyinSequenceOptions(candidates, parts) {
+            const container = document.getElementById('options-container');
+            const slotsContainer = document.getElementById('pinyin-slots');
+            let selectedParts = [];
+
+            slotsContainer.innerHTML = parts.map(() => `<span class="border-b-4 border-dashed border-indigo-300 px-4 min-w-[2.5rem] inline-block text-center">?</span>`).join('');
+
+            // 随机乱序候选拼音
+            const shuffledCandidates = [...candidates].sort(() => Math.random() - 0.5);
+
+            shuffledCandidates.forEach(cand => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white border-2 border-gray-200 hover:border-indigo-400 text-gray-700 py-4 px-6 rounded-2xl font-bold text-lg transition-all active:scale-95 shadow-sm";
+                btn.innerText = cand;
+                btn.onclick = () => {
+                    if (selectedParts.length < parts.length) {
+                        selectedParts.push(cand);
+                        slotsContainer.children[selectedParts.length - 1].innerText = cand;
+                        slotsContainer.children[selectedParts.length - 1].className = "border-b-4 border-indigo-500 px-4 min-w-[2.5rem] inline-block text-center text-indigo-600";
+                        btn.disabled = true;
+                        btn.classList.add('opacity-40');
+
+                        if (selectedParts.length === parts.length) {
+                            setTimeout(() => {
+                                const isCorrect = selectedParts.every((val, index) => val === parts[index]);
+                                if (isCorrect) {
+                                    handleCorrectAnswer();
+                                } else {
+                                    handleWrongAnswer();
+                                    selectedParts = [];
+                                    Array.from(slotsContainer.children).forEach(slot => {
+                                        slot.innerText = "?";
+                                        slot.className = "border-b-4 border-dashed border-indigo-300 px-4 min-w-[2.5rem] inline-block text-center";
+                                    });
+                                    Array.from(container.children).forEach(b => {
+                                        b.disabled = false;
+                                        b.classList.remove('opacity-40');
+                                    });
+                                }
+                            }, 400);
+                        }
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // 选项卡切换逻辑
+        function switchTab(tabId) {
+            const tabs = ['sm', 'dy', 'fy'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const content = document.getElementById(`${t}-keyboard`);
+                if (t === tabId) {
+                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-indigo-600 transition-all";
+                    content.classList.remove('hidden');
+                } else {
+                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 hover:bg-white/50 transition-all";
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        function renderFullKeyboard(correctParts) {
+            const smContainer = document.getElementById('sm-keyboard');
+            const dyContainer = document.getElementById('dy-keyboard');
+            const fyContainer = document.getElementById('fy-keyboard');
+            
+            smContainer.innerHTML = '';
+            dyContainer.innerHTML = '';
+            fyContainer.innerHTML = '';
+
+            // 默认切到声母
+            switchTab('sm');
+
+            // 1. 声母 (补充“无声母”)
+            const allShengmus = ['', ...shengmuList];
+            allShengmus.forEach(sm => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-2 bg-white border border-gray-100 rounded-xl font-bold text-sm hover:border-indigo-400 active:scale-90 transition-all shadow-sm";
+                btn.innerText = sm === "" ? "无" : sm;
+                btn.onclick = () => {
+                    selectedShengmu = sm;
+                    document.getElementById('sm-slot').innerText = sm === "" ? "无" : sm;
+                    Array.from(smContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                    btn.classList.add('bg-indigo-100', 'border-indigo-400');
+                };
+                smContainer.appendChild(btn);
+            });
+
+            // 2. 单韵母
+            danYunmuList.forEach(ym => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-2 bg-white border border-gray-100 rounded-xl font-bold text-sm hover:border-indigo-400 active:scale-90 transition-all shadow-sm";
+                btn.innerText = ym;
+                btn.onclick = () => {
+                    selectedYunmu = ym;
+                    document.getElementById('ym-slot').innerText = ym;
+                    Array.from(dyContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                    Array.from(fyContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                    btn.classList.add('bg-indigo-100', 'border-indigo-400');
+                };
+                dyContainer.appendChild(btn);
+            });
+
+            // 3. 复韵母 (带调)
+            fuYunmuList.forEach(ym => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-2 bg-white border border-gray-100 rounded-xl font-bold text-sm hover:border-indigo-400 active:scale-90 transition-all shadow-sm";
+                btn.innerText = ym;
+                btn.onclick = () => {
+                    selectedYunmu = ym;
+                    document.getElementById('ym-slot').innerText = ym;
+                    Array.from(dyContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                    Array.from(fyContainer.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                    btn.classList.add('bg-indigo-100', 'border-indigo-400');
+                };
+                fyContainer.appendChild(btn);
+            });
+
+            document.getElementById('submit-btn').onclick = () => {
+                if (selectedYunmu === "") {
+                    alert("请选择一个韵母！");
+                    return;
+                }
+                const isCorrect = (selectedShengmu === correctParts[0] && selectedYunmu === correctParts[1]);
+                if (isCorrect) {
+                    handleCorrectAnswer();
+                } else {
+                    handleWrongAnswer();
+                }
+            };
+
+            document.getElementById('clear-btn').onclick = () => {
+                selectedShengmu = "";
+                selectedYunmu = "";
+                document.getElementById('sm-slot').innerText = "?";
+                document.getElementById('ym-slot').innerText = "?";
+                [smContainer, dyContainer, fyContainer].forEach(container => {
+                    Array.from(container.children).forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-400'));
+                });
+            };
+        }
+
+        function handleCorrectAnswer() {
+            speak("答对了！真棒！");
+            levelScore += GameConfig.settings.baseScore;
+            score += GameConfig.settings.baseScore;
+            document.getElementById('score-display').innerText = score;
+            
+            const displayArea = document.getElementById('question-display-area').parentElement;
+            displayArea.classList.add('bg-green-50', 'border-green-300');
+            
+            // 增加延迟到 1.5s，确保“答对了”说完且题目显示后再朗读下一题
+            setTimeout(() => {
+                displayArea.classList.remove('bg-green-50', 'border-green-300');
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        function handleWrongAnswer() {
+            speak("再试一次吧！");
+            lives--;
+            updateHearts();
+
+            const displayArea = document.getElementById('question-display-area').parentElement;
+            displayArea.classList.add('bg-red-50', 'border-red-300');
+
+            setTimeout(() => {
+                displayArea.classList.remove('bg-red-50', 'border-red-300');
+                // 修复：只有当生命值真正小于等于 0 时才结束关卡
+                if (lives <= 0) {
+                    endLevel(false);
+                }
+            }, 1000);
+        }
+
+        function endLevel(isSuccess = true) {
+            document.getElementById('game-play').classList.add('hidden');
+            document.getElementById('game-over').classList.remove('hidden');
+            
+            const title = document.querySelector('#game-over h2');
+            const desc = document.querySelector('#game-over p');
+            const icon = document.querySelector('#game-over .text-6xl');
+            
+            if (isSuccess) {
+                icon.innerText = "🏆";
+                title.innerText = "关卡完成！";
+                desc.innerText = "你太棒了！拼音能力又提升了！";
+                speak(`关卡完成！你获得了${levelScore}分！`);
+            } else {
+                icon.innerText = "💪";
+                title.innerText = "挑战失败";
+                desc.innerText = "别灰心，再练习一下吧！";
+                speak("挑战失败，继续加油哦！");
+            }
+            
+            document.getElementById('final-score').innerText = levelScore;
+        }
+
+        function goHome() {
+            document.getElementById('game-play').classList.add('hidden');
+            document.getElementById('review-mode').classList.add('hidden');
+            document.getElementById('game-over').classList.add('hidden');
+            document.getElementById('home-btn').classList.add('hidden');
+            document.getElementById('level-select').classList.remove('hidden');
+            initLevelSelect();
+        }
+
+        document.getElementById('sound-btn').onclick = playCurrentSound;
+        document.getElementById('home-btn').onclick = goHome;
+        document.getElementById('retry-btn').onclick = goHome;
+
+        window.onload = () => {
+            initLevelSelect();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
