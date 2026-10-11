@@ -201,6 +201,40 @@
             window.speechSynthesis.speak(utterance);
         }
 
+        // 音频缓存 + 预加载（解决点击后才下载导致的延迟/无声）
+        const audioCache = {};
+        function getAudio(src) {
+            if (!audioCache[src]) {
+                const a = new Audio();
+                a.preload = 'auto';
+                a.src = src;
+                audioCache[src] = a;
+            }
+            return audioCache[src];
+        }
+        function preloadAudioSrc(src) {
+            if (!audioCache[src]) {
+                const a = new Audio();
+                a.preload = 'auto';
+                a.src = src;
+                a.load();
+                audioCache[src] = a;
+            }
+        }
+        function preloadPinyin(key) {
+            if (!key || !GameConfig.pinyinToAudioMap) return;
+            const src = GameConfig.pinyinToAudioMap[key.trim().normalize('NFC')];
+            if (src) preloadAudioSrc(new URL(src, window.location.href).href);
+        }
+        function preloadLevelAudio(questions) {
+            (questions || []).forEach(q => {
+                if (q.sound) preloadPinyin(q.sound);
+                if (q.pinyin) preloadPinyin(q.pinyin);
+                if (q.answer) preloadPinyin(q.answer);
+                if (q.displayText) preloadPinyin(q.displayText);
+            });
+        }
+
         // 统一音频播放逻辑：优先查找映射表素材，没有则回退到 TTS
         function playAudio(pinyin, fallbackText) {
             if (!pinyin) return;
@@ -214,7 +248,7 @@
                 const fullUrl = new URL(audioSrc, window.location.href).href;
                 console.log(`[Audio] 尝试播放素材: ${normalizedPinyin} -> ${fullUrl}`);
                 
-                const audio = new Audio(fullUrl);
+                const audio = getAudio(fullUrl);
                 
                 // 监听加载错误（如 404）
                 audio.onerror = () => {
@@ -312,6 +346,9 @@
             lives = 3;
             levelScore = 0;
 
+            // 预加载本关全部音频，点击即时发声
+            preloadLevelAudio(currentQuestions);
+
             document.getElementById('game-play').classList.remove('hidden');
             loadQuestion();
         }
@@ -324,6 +361,7 @@
             reviewSection.classList.remove('hidden');
 
             GameConfig.reviewData.forEach(group => {
+                group.items.forEach(item => preloadPinyin(item));
                 const groupEl = document.createElement('div');
                 groupEl.className = "space-y-3";
                 
