@@ -240,30 +240,39 @@
         function playAudio(pinyin, fallbackText) {
             if (!pinyin) return;
             const normalizedPinyin = pinyin.trim().normalize('NFC');
-            
-            // 1. 尝试从映射表中获取外部素材路径
             const audioSrc = GameConfig.pinyinToAudioMap && GameConfig.pinyinToAudioMap[normalizedPinyin];
-            
-            if (audioSrc) {
-                // 使用绝对路径解析，确保在 GitHub Pages 子目录下也能准确定位
-                const fullUrl = new URL(audioSrc, window.location.href).href + AUDIO_VER;
-                console.log(`[Audio] 尝试播放素材: ${normalizedPinyin} -> ${fullUrl}`);
-                
-                const audio = getAudio(fullUrl);
-                
-                // 监听加载错误（如 404）
-                audio.onerror = () => {
-                    console.warn(`[Audio] 素材加载失败: ${fullUrl}，回退到 TTS`);
-                    speak(fallbackText || normalizedPinyin);
-                };
+            if (!audioSrc) { speak(fallbackText || normalizedPinyin); return; }
 
-                audio.play().catch(err => {
-                    console.warn("[Audio] 播放被拦截或失败，回退到 TTS:", err);
-                    speak(fallbackText || normalizedPinyin);
-                });
+            const fullUrl = new URL(audioSrc, window.location.href).href + AUDIO_VER;
+            const audio = getAudio(fullUrl);
+
+            let played = false;
+            const fallback = () => { if (!played) { played = true; speak(fallbackText || normalizedPinyin); } };
+            const doPlay = () => {
+                if (played) return;
+                try {
+                    audio.currentTime = 0;
+                    const p = audio.play();
+                    if (p && p.catch) p.catch(() => {
+                        // 手机首次 play 可能被自动播放策略拦截，稍后重试一次
+                        setTimeout(() => {
+                            if (played) return;
+                            try { audio.currentTime = 0; audio.play().catch(fallback); }
+                            catch(e) { fallback(); }
+                        }, 150);
+                    });
+                } catch(e) { fallback(); }
+            };
+
+            audio.onerror = fallback;
+            if (audio.readyState >= 3) {
+                // 已加载足够数据，立即播放
+                doPlay();
             } else {
-                // 2. 映射表没有，直接用 TTS
-                speak(fallbackText || normalizedPinyin);
+                // 还没加载完（手机对 preload 会降级），等 canplaythrough 再播
+                audio.removeEventListener('canplaythrough', doPlay);
+                audio.addEventListener('canplaythrough', doPlay, { once: true });
+                try { audio.load(); } catch(e) {}
             }
         }
 
