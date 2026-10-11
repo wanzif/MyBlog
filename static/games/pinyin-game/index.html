@@ -611,7 +611,7 @@ const audioCache = {};
 function playAudio(key, onEnded){
   const f = AUDIO_MAP[key];
   if(!f){ if(onEnded) onEnded(); return; }
-  if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3');
+  if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3?v=2');
   const a = audioCache[f];
   a.onended = null;
   a.onerror = null;
