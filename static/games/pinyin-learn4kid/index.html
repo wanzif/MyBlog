@@ -203,6 +203,7 @@
 
         // 音频缓存 + 预加载（解决点击后才下载导致的延迟/无声）
         const audioCache = {};
+        const AUDIO_VER = '?v=3';  // 音频版本号，改音频后 +1 强制刷新浏览器缓存
         function getAudio(src) {
             if (!audioCache[src]) {
                 const a = new Audio();
@@ -224,7 +225,7 @@
         function preloadPinyin(key) {
             if (!key || !GameConfig.pinyinToAudioMap) return;
             const src = GameConfig.pinyinToAudioMap[key.trim().normalize('NFC')];
-            if (src) preloadAudioSrc(new URL(src, window.location.href).href);
+            if (src) preloadAudioSrc(new URL(src, window.location.href).href + AUDIO_VER);
         }
         function preloadLevelAudio(questions) {
             (questions || []).forEach(q => {
@@ -245,7 +246,7 @@
             
             if (audioSrc) {
                 // 使用绝对路径解析，确保在 GitHub Pages 子目录下也能准确定位
-                const fullUrl = new URL(audioSrc, window.location.href).href;
+                const fullUrl = new URL(audioSrc, window.location.href).href + AUDIO_VER;
                 console.log(`[Audio] 尝试播放素材: ${normalizedPinyin} -> ${fullUrl}`);
                 
                 const audio = getAudio(fullUrl);
