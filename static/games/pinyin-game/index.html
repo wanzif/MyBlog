@@ -608,12 +608,20 @@ const AUDIO_MAP = {
   shī:'shi1', shí:'shi2', shǐ:'shi3', shì:'shi4', lá:'la2', lǎ:'la3', là:'la4'
 };
 const audioCache = {};
-function playAudio(key){
+function playAudio(key, onEnded){
   const f = AUDIO_MAP[key];
-  if(!f) return;
+  if(!f){ if(onEnded) onEnded(); return; }
   if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3');
   const a = audioCache[f];
-  try{ a.currentTime = 0; a.play(); }catch(e){}
+  a.onended = null;
+  a.onerror = null;
+  if(onEnded){
+    let done = false;
+    const cb = () => { if(!done){ done = true; onEnded(); } };
+    a.onended = cb;
+    a.onerror = cb;
+  }
+  try{ a.currentTime = 0; a.play(); }catch(e){ if(onEnded) onEnded(); }
 }
 
 /* ---------------- 音效（Web Audio） ---------------- */
@@ -757,13 +765,12 @@ function openModal(it){
   $('modalWord').textContent=it.word;
   $('modalRead').textContent='读作：'+it.read+'（'+it.label+'）';
   $('modal').classList.remove('hidden');
-  playAudio(it.label);
-  setTimeout(()=>speak(it.word), 700);
+  playAudio(it.label, () => speak(it.word));
 }
 function replayModal(){
   const it = currentModalItem || null;
   if(!it) return;
-  playAudio(it.label); setTimeout(()=>speak(it.word), 650);
+  playAudio(it.label, () => speak(it.word));
 }
 let currentModalItem = null;
 // 包装 openModal 记录当前项
