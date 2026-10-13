@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
 <title>拼音乐园 · 一年级拼音小游戏</title>
 <style>
   :root{
@@ -116,7 +116,7 @@
   .letter-card .lw{ font-size:clamp(14px,1.8vw,18px); font-weight:700; }
   .lc-0{ background:linear-gradient(150deg,#ff8a80,#ef5350); }
   .lc-1{ background:linear-gradient(150deg,#ffb74d,#fb8c00); }
-  .lc-2{ background:linear-gradient(150deg,#ffd54f,#f9a825); }
+  .lc-2{ background:linear-gradient(150deg,#ffd54f,#ffb300); color:#5d4037; }
   .lc-3{ background:linear-gradient(150deg,#aed581,#66bb6a); }
   .lc-4{ background:linear-gradient(150deg,#4dd0e1,#26a69a); }
   .lc-5{ background:linear-gradient(150deg,#64b5f6,#1e88e5); }
@@ -282,6 +282,7 @@
   <header>
     <button id="backBtn" class="hidden" aria-label="返回">←</button>
     <h1 id="title">拼音乐园</h1>
+    <button id="muteBtn" aria-label="静音" title="静音开关" style="width:46px;height:46px;border:none;border-radius:12px;background:rgba(255,255,255,.9);color:#1976d2;font-size:24px;font-weight:bold;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;transition:transform .08s;">🔊</button>
     <div id="starBox"><span class="star-icon">⭐</span><span id="starCount">0</span></div>
   </header>
   <main>
@@ -441,9 +442,9 @@ const PINYIN = {
     {label:"un",  read:"温", word:"车轮", emoji:"🛞"},
     {label:"ün",  read:"晕", word:"云朵", emoji:"☁️"},
     {label:"ang", read:"昂", word:"阳光", emoji:"☀️"},
-    {label:"eng", read:"风", word:"风筝", emoji:"🪁"},
-    {label:"ing", read:"星", word:"星星", emoji:"⭐"},
-    {label:"ong", read:"红", word:"恐龙", emoji:"🦖"},
+    {label:"eng", read:"灯", word:"风筝", emoji:"🪁"},
+    {label:"ing", read:"英", word:"星星", emoji:"⭐"},
+    {label:"ong", read:"轰", word:"恐龙", emoji:"🦖"},
   ],
   // 整体认读音节 16
   whole: [
@@ -548,6 +549,18 @@ const LISTEN = [
   {read:"衣", ans:"i",  opts:["i","u","y","ü"],     cat:"单韵母"},
   {read:"乌", ans:"u",  opts:["u","i","o","w"],     cat:"单韵母"},
   {read:"鱼", ans:"ü",  opts:["ü","u","i","yu"],    cat:"单韵母"},
+  // 复韵母（ou 与 o、ao 的最小对立）
+  {read:"欧", ans:"ou",  opts:["ou","o","ao","ong"], cat:"复韵母"},
+  {read:"喔", ans:"o",   opts:["o","ou","uo","e"],   cat:"复韵母"},
+  {read:"凹", ans:"ao",  opts:["ao","ou","o","ai"],  cat:"复韵母"},
+  // 鼻韵母（前鼻 vs 后鼻，ong/eng/ing 互辨）
+  {read:"轰", ans:"ong", opts:["ong","eng","ang","ou"], cat:"鼻韵母"},
+  {read:"灯", ans:"eng", opts:["eng","ong","en","an"],  cat:"鼻韵母"},
+  {read:"昂", ans:"ang", opts:["ang","eng","an","ong"], cat:"鼻韵母"},
+  {read:"英", ans:"ing", opts:["ing","in","eng","ying"],cat:"鼻韵母"},
+  {read:"安", ans:"an",  opts:["an","ang","en","ai"],  cat:"鼻韵母"},
+  {read:"恩", ans:"en",  opts:["en","eng","in","an"],  cat:"鼻韵母"},
+  {read:"音", ans:"in",  opts:["in","ing","en","yin"], cat:"鼻韵母"},
 ];
 
 const BADGES = [
@@ -608,10 +621,21 @@ const AUDIO_MAP = {
   shī:'shi1', shí:'shi2', shǐ:'shi3', shì:'shi4', lá:'la2', lǎ:'la3', là:'la4'
 };
 const audioCache = {};
+let muted = false;
+function toggleMute(){
+  muted = !muted;
+  const mb = $('muteBtn');
+  if(mb) mb.textContent = muted ? '🔇' : '🔊';
+  if(muted){
+    try{ speechSynthesis.cancel(); }catch(e){}
+    Object.keys(audioCache).forEach(k=>{ const a=audioCache[k]; a.pause(); a.currentTime=0; });
+  }
+}
 function playAudio(key, onEnded){
+  if(muted){ if(onEnded) onEnded(); return; }
   const f = AUDIO_MAP[key];
   if(!f){ if(onEnded) onEnded(); return; }
-  if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3?v=2');
+  if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3?v=3');
   const a = audioCache[f];
   a.onended = null;
   a.onerror = null;
@@ -624,6 +648,26 @@ function playAudio(key, onEnded){
   try{ a.currentTime = 0; a.play(); }catch(e){ if(onEnded) onEnded(); }
 }
 
+/* 预加载全部真人音频：页面加载后立即把 AUDIO_MAP 用到的所有 mp3 实例化并触发下载，
+   点读时零延迟。 */
+function preloadAllAudio(){
+  const files = Object.keys(AUDIO_MAP).map(k=>AUDIO_MAP[k]);
+  const uniq = Array.from(new Set(files));
+  let loaded = 0;
+  uniq.forEach(f=>{
+    const a = new Audio();
+    a.preload = 'auto';
+    a.src = 'audio/'+f+'.mp3?v=3';
+    a.addEventListener('canplaythrough', ()=>{ loaded++; }, {once:true});
+    a.addEventListener('error', ()=>{ loaded++; }, {once:true});
+    a.load();
+    audioCache[f] = a;
+  });
+  const done = ()=>{ console.log('[预加载] 音频就绪 '+loaded+'/'+uniq.length); };
+  if(uniq.length===0){ done(); return; }
+  const timer = setInterval(()=>{ if(loaded>=uniq.length){ clearInterval(timer); done(); } }, 200);
+}
+
 /* ---------------- 音效（Web Audio） ---------------- */
 let AC = null;
 function ac(){
@@ -632,6 +676,7 @@ function ac(){
   return AC;
 }
 function tone(freq, t0, dur, type, vol){
+  if(muted) return;
   const c = ac(); if(!c) return;
   const o = c.createOscillator(), g = c.createGain();
   o.type = type||'sine'; o.frequency.setValueAtTime(freq, t0);
@@ -765,12 +810,12 @@ function openModal(it){
   $('modalWord').textContent=it.word;
   $('modalRead').textContent='读作：'+it.read+'（'+it.label+'）';
   $('modal').classList.remove('hidden');
-  playAudio(it.label, () => setTimeout(() => speak(it.word), 700));
+  playAudio(it.label);
 }
 function replayModal(){
   const it = currentModalItem || null;
   if(!it) return;
-  playAudio(it.label, () => setTimeout(() => speak(it.word), 700));
+  playAudio(it.label);
 }
 let currentModalItem = null;
 // 包装 openModal 记录当前项
@@ -799,8 +844,8 @@ function nextSpell(){
   };
   spellRound++;
   renderSpell();
-  // 读出目标
-  setTimeout(()=>speak(combo.word), 350);
+  // 读出目标音节（真人音频）
+  setTimeout(()=>playAudio(combo.syl), 350);
 }
 function renderSpell(){
   const st=spellState;
@@ -828,7 +873,7 @@ function renderPool(id, items, type){
     p.appendChild(c);
   });
 }
-function speakSpellTarget(){ if(spellState) speak(spellState.combo.word); }
+function speakSpellTarget(){ if(spellState) playAudio(spellState.combo.syl); }
 
 /* 拖拽 + 点击兜底 */
 function attachDrag(el, type, label){
@@ -893,7 +938,6 @@ function placeInto(slot, type, label){
   const wantI = slot.dataset.type==='i';
   if(wantI !== (type==='i')){
     feedback('放到'+(type==='i'?'声母':'韵母')+'格子哦', false);
-    speak('放到'+(type==='i'?'声母':'韵母')+'格子哦');
     return;
   }
   if(wantI){
@@ -1031,6 +1075,14 @@ function answerListen(q, op, btn){
 ===================================================================== */
 updateStarUI();
 setTitle('menu');
+
+// 静音开关 + 音频预加载
+$('muteBtn').addEventListener('click', toggleMute);
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', preloadAllAudio);
+}else{
+  preloadAllAudio();
+}
 </script>
 </body>
 </html>
