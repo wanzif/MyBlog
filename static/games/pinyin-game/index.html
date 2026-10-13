@@ -635,7 +635,7 @@ function playAudio(key, onEnded){
   if(muted){ if(onEnded) onEnded(); return; }
   const f = AUDIO_MAP[key];
   if(!f){ if(onEnded) onEnded(); return; }
-  if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3?v=4');
+  if(!audioCache[f]) audioCache[f] = new Audio('audio/'+f+'.mp3?v=5');
   const a = audioCache[f];
   a.onended = null;
   a.onerror = null;
@@ -657,7 +657,7 @@ function preloadAllAudio(){
   uniq.forEach(f=>{
     const a = new Audio();
     a.preload = 'auto';
-    a.src = 'audio/'+f+'.mp3?v=4';
+    a.src = 'audio/'+f+'.mp3?v=5';
     a.addEventListener('canplaythrough', ()=>{ loaded++; }, {once:true});
     a.addEventListener('error', ()=>{ loaded++; }, {once:true});
     a.load();

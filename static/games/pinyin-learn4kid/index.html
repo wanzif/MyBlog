@@ -203,7 +203,7 @@
 
         // 音频缓存 + 预加载（解决点击后才下载导致的延迟/无声）
         const audioCache = {};
-        const AUDIO_VER = '?v=6';  // 音频版本号，改音频后 +1 强制刷新浏览器缓存
+        const AUDIO_VER = '?v=7';  // 音频版本号，改音频后 +1 强制刷新浏览器缓存
         function getAudio(src) {
             if (!audioCache[src]) {
                 const a = new Audio();
